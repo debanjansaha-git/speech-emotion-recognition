@@ -1,7 +1,21 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*__pycache__/
 *.py[cod]
 *$py.class
+*.DS_Store
+
+# Datasets (huge!)
+src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
+src/mlcore/artifacts/data_ingestion/ravdess/Actor*
+src/mlcore/artifacts/data_ingestion/ravdess/audio*
+src/mlcore/artifacts/data_ingestion/savee/ALL/*
+src/mlcore/artifacts/data_ingestion/tess/TESS*/
+*parquet*
+src/mlcore/artifacts/data_transformation/emotion.csv
+
+# Logs
+*logs/
 
 # C extensions
 *.so

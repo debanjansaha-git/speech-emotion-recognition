@@ -1,0 +1,71 @@
+artifacts_root: src/mlcore/artifacts
+
+### ================================================================
+###                 INGESTION CONFIGURATION
+### ================================================================
+
+data_ingestion_ravdess:
+  root_dir: src/mlcore/artifacts/data_ingestion
+  source_URL: 'ravdess:https%3A%2F%2Fstorage.googleapis.com%2Fkaggle-data-sets%2F107620%2F256618%2Fbundle%2Farchive.zip%3FX-Goog-Algorithm%3DGOOG4-RSA-SHA256%26X-Goog-Credential%3Dgcp-kaggle-com%2540kaggle-161607.iam.gserviceaccount.com%252F20240307%252Fauto%252Fstorage%252Fgoog4_request%26X-Goog-Date%3D20240307T173534Z%26X-Goog-Expires%3D259200%26X-Goog-SignedHeaders%3Dhost%26X-Goog-Signature%3D4e1d45bd6b3ec9c609e6e9b0a83691267b014d3609e71d2f1409a19f04731c18d41a052818a98b8251d76b73cada57414de360361b179ea7cec8830240b9c7bb19409c568a9744533baa3e36e30183b8e47fe966efbf5b7d9b618564f5385f86f8307df1d66ae3c40bd085e5aa74b5efcb337293e0c508efc0b52a9fc052ea6b6898a69711d9f2b5b5025419b31c4272b0a449990dd089f03ec1898c08069608c009359e175047fc83fd3360640a222e8041927ded5fe3823d313ecbbe603a52c5b9af17f35596fd23ae7f6d4dae158b51617f2763cd70d2796087b8c1d254d5ab7232c693aede1755a555ad1a15471e0d404964d2bca1bbb6502eb3363ff9bc'
+  local_data_path: src/mlcore/artifacts/data_ingestion/ravdess
+
+data_ingestion_tess:
+  root_dir: src/mlcore/artifacts/data_ingestion
+  source_URL: 'tess:https%3A%2F%2Fstorage.googleapis.com%2Fkaggle-data-sets%2F316368%2F639622%2Fbundle%2Farchive.zip%3FX-Goog-Algorithm%3DGOOG4-RSA-SHA256%26X-Goog-Credential%3Dgcp-kaggle-com%2540kaggle-161607.iam.gserviceaccount.com%252F20240307%252Fauto%252Fstorage%252Fgoog4_request%26X-Goog-Date%3D20240307T173534Z%26X-Goog-Expires%3D259200%26X-Goog-SignedHeaders%3Dhost%26X-Goog-Signature%3Db3a1e490955ffbc8f372d30189200474ef350e99798f111c70691d41631972308a90694cc0e9b832befb2c28c7f1607aa8917e2022117743de0cac88c77a6c39036c61d6d6fb5eeed708fc8423b2bbae0eef2812f91fc824d996e256c8dde0dffe10e676cd3b30ed084d9899e4bbb23bdf961cb3a1a82273b9c6cda40b2a2d349da3ba1936ca4c0c7c69f894120656816d53d0c050ad4372bd0877f9422d9ae7e839c2cf2cc692c10ae5472ee42b253afe1d94ef14905226c9782e619cf027d274454b9d6bcfef44898e3ad420b27b413bc6afc41817c7b5822f95854b5c57e94e2c6d7630e42c4a95481b2dcb5120c0be6ebb954bdf234383d8a44146ad7c28'
+  local_data_path: src/mlcore/artifacts/data_ingestion/tess
+
+data_ingestion_cremad:
+  root_dir: src/mlcore/artifacts/data_ingestion
+  source_URL: 'cremad:https%3A%2F%2Fstorage.googleapis.com%2Fkaggle-data-sets%2F325566%2F653195%2Fbundle%2Farchive.zip%3FX-Goog-Algorithm%3DGOOG4-RSA-SHA256%26X-Goog-Credential%3Dgcp-kaggle-com%2540kaggle-161607.iam.gserviceaccount.com%252F20240307%252Fauto%252Fstorage%252Fgoog4_request%26X-Goog-Date%3D20240307T173534Z%26X-Goog-Expires%3D259200%26X-Goog-SignedHeaders%3Dhost%26X-Goog-Signature%3Da9809368c54f8c174c9913b45dc9c5ae5404403b9a7d18cf6228c5531edef5f2a652ea8aaf16ea45abe9be9a8d139d8a530f376c2f70feaaa5b4b915831da12d8d1692588124975d83199e2d7e43fd11dfe3dc27c4198f7ab2900c3629f6d3a11e1ca8f31a09d5baa310afead273ca5af5947b6d91b18890845589e3ec15e04b9227fa1861492df611dc22bddc8bc2d59c72658b5369a4367b56d65ffb906c891903a87c972fbc3c80022f9fb62cc37bf7ff040596bce95a6a92947c7c73b00818fa17bef748bb9f230f11e870740ee36a31f3df8ae4e24ab6d17c62704ad5773761208396c21f8490d3c32eb0c7bec21d12d15c0587cfaf80f144728d40ab1a'
+  local_data_path: src/mlcore/artifacts/data_ingestion/cremad
+
+data_ingestion_savee:
+  root_dir: src/mlcore/artifacts/data_ingestion
+  source_URL: 'savee:https%3A%2F%2Fstorage.googleapis.com%2Fkaggle-data-sets%2F338555%2F671851%2Fbundle%2Farchive.zip%3FX-Goog-Algorithm%3DGOOG4-RSA-SHA256%26X-Goog-Credential%3Dgcp-kaggle-com%2540kaggle-161607.iam.gserviceaccount.com%252F20240307%252Fauto%252Fstorage%252Fgoog4_request%26X-Goog-Date%3D20240307T173534Z%26X-Goog-Expires%3D259200%26X-Goog-SignedHeaders%3Dhost%26X-Goog-Signature%3Db0ce5b1b3395c0db76c5b29b166ba60fd22c3eb5bf7acdc54e96e443566b468c01427af588ef192d758393224a4abfff420e3b262150ef48f6e8f5d18274aa9d8f3a23c539d8183a5337a4050b2ad6661ea25219fa2825882511bc194fe0a4cc7c92664c12faf85260676e32a9799c5de7769983065a1ce131f407e15a0cd7cf918167df60ceb30e7ac7b588cac1c89fde810234a8f17923f20060b23e028a5a55aa682a53dfec2757e65d87350cff4975322ebfcff746a72ce4a6b14c1095d54a7f90fdb38efd496ec77ec67fa82cf773cb364ae9e5bfb69207d7e11489068966d5e9b1a72cf66aa2ffba9e8374a51a37172524bd6c83cea48bd51c39dac591'
+  local_data_path: src/mlcore/artifacts/data_ingestion/savee
+
+### ================================================================
+###                DATA VALIDATION CONFIGURATION
+### ================================================================
+
+data_validation:
+  root_dir: src/mlcore/artifacts/data_validation
+  unzip_ravdess_dir: src/mlcore/artifacts/data_ingestion/ravdess
+  unzip_tess_dir: src/mlcore/artifacts/data_ingestion/tess/TESS Toronto emotional speech set data
+  unzip_cremad_dir: src/mlcore/artifacts/data_ingestion/cremad/AudioWAV
+  unzip_savee_dir: src/mlcore/artifacts/data_ingestion/savee/ALL
+  local_output_path: src/mlcore/artifacts/data_validation/metadata.csv
+  validation_status: src/mlcore/artifacts/data_validation/status.txt
+
+### ================================================================
+###              DATA TRANSFORMATION CONFIGURATION
+### ================================================================
+
+data_transformation:
+  root_dir: src/mlcore/artifacts/data_transformation
+  metadata_path: src/mlcore/artifacts/data_validation/metadata.csv
+  output_path: src/mlcore/artifacts/data_transformation/emotions.parquet.gzip
+  train_path: src/mlcore/artifacts/data_transformation/train.parquet.gzip
+  test_path: src/mlcore/artifacts/data_transformation/test.parquet.gzip
+  
+### ================================================================
+###                 MODEL TRAIN CONFIGURATION
+### ================================================================
+
+model_trainer:
+  root_dir: src/mlcore/artifacts/model_training
+  train_data_path: src/mlcore/artifacts/data_transformation/train.parquet.gzip
+  test_data_path: src/mlcore/artifacts/data_transformation/test.parquet.gzip
+  model_name: model.joblib
+
+### ================================================================
+###               MODEL EVALUATE CONFIGURATION
+### ================================================================
+
+model_evaluation:
+  root_dir: src/mlcore/artifacts/model_evaluation
+  train_data_path: src/mlcore/artifacts/data_transformation/train.parquet.gzip
+  test_data_path: src/mlcore/artifacts/data_transformation/test.parquet.gzip
+  model_path: src/mlcore/artifacts/model_training/model.joblib
+  metric_file_name: src/mlcore/artifacts/model_evaluation/metrics.json
+  mlflow_uri: http://internal.docker.com:5000/

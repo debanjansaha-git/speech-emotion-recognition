@@ -1,0 +1,9 @@
+### Data Transformation Parameters
+data_transforms:
+  params: ['default', 'noise', 'pitch', 'pitch_noise']
+
+### Model Parameters
+model_parans:
+  RandomForestClassifier:
+    max_depth: 6
+    n_estimators: 48
