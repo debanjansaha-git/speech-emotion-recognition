@@ -47,12 +47,22 @@
 │   │   ├── logs
 │   │   │   └── running_logs.log        ## logs
 │   │   ├── pipeline
-│   │   │   ├── __init__.py
-│   │   │   ├── stage_01_data_ingestion.py      ## ingestion pipeline script
-│   │   │   ├── stage_02_data_validation.py     ## validation pipeline script
-│   │   │   ├── stage_03_data_transformation.py ## transformation pipeline script
-│   │   │   ├── stage_04_model_trainer.py       ## model training pipeline script
-│   │   │   └── stage_05_model_evaluation.py    ## model evaluation pipeline script
+│   │   │   └── airflow                 ## Airflow pipeline
+│   │   │       ├── Dockerfile                          ## Dockerfile for Airflow
+│   │   │       ├── dags                                ## Main DAGs directory
+│   │   │       │   ├── __init__.py
+│   │   │       │   ├── data_pipeline.py                ## empty pipeline dag
+│   │   │       │   ├── data_process.py                 ## demo dag
+│   │   │       │   ├── stage_01_data_ingestion.py      ## ingestion pipeline script
+│   │   │       │   ├── stage_02_data_validation.py     ## validation pipeline script
+│   │   │       │   ├── stage_03_data_transformation.py ## transformation pipeline script
+│   │   │       │   ├── stage_04_model_trainer.py       ## model training pipeline script
+│   │   │       │   └── stage_05_model_evaluation.py    ## model evaluation pipeline script
+│   │   │       ├── docker-compose.yaml                 ## Docker compose file
+│   │   │       ├── logs
+│   │   │       ├── plugins
+│   │   │       ├── requirements.txt
+│   │   │       └── secrets
 │   │   └── utils
 │   │       ├── __init__.py
 │   │       └── common.py               ## common utility functions
