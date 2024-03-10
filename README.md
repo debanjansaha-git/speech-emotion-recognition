@@ -58,8 +58,8 @@ Below contains guidance on how to execute the modules.
 
 
   > [!WARNING]
-  > All codes/commands have to be executed from the root folder.
-   - Move to the root in project directory
+  > All codes/commands have to be executed from the **dags** folder.
+   - Move to the **dags** in project directory
 
   > [!CAUTION]
    - In order to execute this module you will need to *build* and *install* the module, otherwise you will get the error
@@ -92,7 +92,7 @@ That means you need to run the previous command from the root folder.
 
 - In order to run any of the data scripts, use commands:
 ```python
-python src/mlcore/pipeline/stage_03_data_transformation.py  
+python stage_03_data_transformation.py  
 ```
 
 

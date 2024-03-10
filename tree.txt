@@ -1,70 +1,82 @@
 .
+├── Dockerfile              ## For Containerization
+├── LICENSE                 ## MIT License
 ├── README.md               ## START FROM HERE
-├── build                   ## binary build 
-├── config                  ## config file
-│   └── config.yaml         ## paths for various configuration files 
-├── dist                    ## build distribution
-├── logs                    ## main logger
-│   └── running_logs.log    ## running logging logs
-├── main.py                 ## run all stages together
-├── params.yaml             ## model parameters, data augmentation
-├── requirements.txt        ## dependencies
-├── schema.yaml             ## dataset schema
-├── setup.py                ## used to build the project
-├── src                     ## source codes - MAIN project folder
-│   ├── logs
-│   ├── mlcore              ## core module for the project
-│   │   ├── __init__.py
-│   │   ├── artifacts                   ## artifacts
-│   │   │   ├── data_ingestion          ## data
-│   │   │   │   ├── cremad
-│   │   │   │   ├── ravdess
-│   │   │   │   ├── savee
-│   │   │   │   └── tess
-│   │   │   ├── data_transformation     ## files from data data transformation
-│   │   │   │   ├── emotion.csv
-│   │   │   │   ├── emotions.parquet.gzip
-│   │   │   │   ├── test.parquet.gzip
-│   │   │   │   └── train.parquet.gzip
-│   │   │   └── data_validation         ## files from data validation
-│   │   │       ├── metadata.csv
-│   │   │       └── status.txt
-│   │   ├── components                  ## core modules
-│   │   │   ├── __init__.py             
-│   │   │   ├── data_ingestion.py       ## ingestion script
-│   │   │   ├── data_transformation.py  ## transformation script
-│   │   │   ├── data_validation.py      ## validation script
-│   │   │   ├── model_evaluation.py     ## evaluation script
-│   │   │   └── model_trainer.py        ## model training script
-│   │   ├── config                      ## configuration items
-│   │   │   ├── __init__.py
-│   │   │   └── configuration.py        ## configuration datastructures
-│   │   ├── constants
-│   │   │   ├── __init__.py             ## path to constants
-│   │   ├── entity                      ## frozen dataclass sets
-│   │   │   ├── __init__.py
-│   │   │   └── config_entity.py        ## dataclass schema settings
-│   │   ├── logs
-│   │   │   └── running_logs.log        ## logs
-│   │   ├── pipeline
-│   │   │   └── airflow                 ## Airflow pipeline
-│   │   │       ├── Dockerfile                          ## Dockerfile for Airflow
-│   │   │       ├── dags                                ## Main DAGs directory
-│   │   │       │   ├── __init__.py
-│   │   │       │   ├── data_pipeline.py                ## empty pipeline dag
-│   │   │       │   ├── data_process.py                 ## demo dag
-│   │   │       │   ├── stage_01_data_ingestion.py      ## ingestion pipeline script
-│   │   │       │   ├── stage_02_data_validation.py     ## validation pipeline script
-│   │   │       │   ├── stage_03_data_transformation.py ## transformation pipeline script
-│   │   │       │   ├── stage_04_model_trainer.py       ## model training pipeline script
-│   │   │       │   └── stage_05_model_evaluation.py    ## model evaluation pipeline script
-│   │   │       ├── docker-compose.yaml                 ## Docker compose file
-│   │   │       ├── logs
-│   │   │       ├── plugins
-│   │   │       ├── requirements.txt
-│   │   │       └── secrets
-│   │   └── utils
-│   │       ├── __init__.py
-│   │       └── common.py               ## common utility functions
-│   └── mlcore.egg-info                 ## distribution
-└── tree.txt                ## folder hierarchy
+├── docker-compose.yaml     ## For starting containers
+├── docs                    ## Documentation
+│   ├── CremaDDataCard.md
+│   ├── RavdessDataCard.md
+│   ├── SaveeDataCard.md
+│   └── TessDataCard.md
+├── logs                    ## Older logs
+│   └── running_logs.log
+├── pipeline
+│   └── airflow             ## Airflow pipeline
+│       ├── dags                        ## Main DAGs directory
+│       │   ├── README.md
+│       │   ├── __init__.py
+│       │   ├── build                   ## mlcore package build
+│       │   ├── data_pipeline.py        ## data pipeline dag
+│       │   ├── data_process.py         ## dummy dag
+│       │   ├── dist                    ## distribution
+│       │   ├── logs                    ## running logs
+│       │   │   └── running_logs.log
+│       │   ├── setup.py                ## install packages script
+│       │   ├── src                     ## source folder
+│       │   │   ├── logs
+│       │   │   ├── mlcore              ## core module for the project
+│       │   │   │   ├── __init__.py
+│       │   │   │   ├── artifacts                   ## artifacts
+│       │   │   │   │   ├── data_ingestion          ## data
+│       │   │   │   │   │   ├── cremad
+│       │   │   │   │   │   ├── ravdess
+│       │   │   │   │   │   ├── savee
+│       │   │   │   │   │   └── tess
+│       │   │   │   │   ├── data_transformation     ## files from data transformation
+│       │   │   │   │   │   ├── emotion.csv
+│       │   │   │   │   │   ├── emotions.parquet.gzip
+│       │   │   │   │   │   ├── test.parquet.gzip
+│       │   │   │   │   │   └── train.parquet.gzip
+│       │   │   │   │   └── data_validation         ## files from data validation
+│       │   │   │   │       ├── metadata.csv
+│       │   │   │   │       └── status.txt
+│       │   │   │   ├── components                  ## core modules
+│       │   │   │   │   ├── __init__.py
+│       │   │   │   │   ├── data_ingestion.py       ## ingestion script
+│       │   │   │   │   ├── data_transformation.py  ## transformation script
+│       │   │   │   │   ├── data_validation.py      ## validation script
+│       │   │   │   │   ├── model_evaluation.py     ## evaluation script
+│       │   │   │   │   └── model_trainer.py        ## model training script
+│       │   │   │   ├── config                      ## configuration items
+│       │   │   │   │   ├── __init__.py
+│       │   │   │   │   ├── config.yaml             ## paths for various configuration files 
+│       │   │   │   │   └── configuration.py        ## configuration datastructures
+│       │   │   │   ├── constants
+│       │   │   │   │   ├── __init__.py             ## path to constants
+│       │   │   │   │   ├── params.yaml             ## model parameters, data augmentation
+│       │   │   │   │   └── schema.yaml             ## dataset schema
+│       │   │   │   ├── entity                      ## frozen dataclass sets
+│       │   │   │   │   ├── __init__.py
+│       │   │   │   │   └── config_entity.py        ## dataclass schema settings
+│       │   │   │   ├── logs
+│       │   │   │   │   └── running_logs.log        ## logs
+│       │   │   │   └── utils
+│       │   │   │       ├── __init__.py
+│       │   │   │       └── common.py               ## common utility functions
+│       │   │   └── mlcore.egg-info                 ## distribution dependencies
+│       │   │       ├── PKG-INFO
+│       │   │       ├── SOURCES.txt
+│       │   │       ├── dependency_links.txt
+│       │   │       └── top_level.txt
+│       │   ├── stage_01_data_ingestion.py          ## ingestion pipeline script
+│       │   ├── stage_02_data_validation.py         ## validation pipeline script
+│       │   ├── stage_03_data_transformation.py     ## transformation pipeline script
+│       │   ├── stage_04_model_trainer.py           ## model training pipeline script
+│       │   ├── stage_05_model_evaluation.py        ## model evaluation pipeline script
+│       │   └── main.py                             ## All-in-one pipeline script
+│       ├── logs
+│       ├── plugins
+│       ├── requirements.txt
+│       └── secrets
+├── requirements.txt
+└── tree.txt
