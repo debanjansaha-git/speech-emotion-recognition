@@ -7,6 +7,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow import configuration as conf
+from src.gcp import authenticate, upload_directory
 
 from stage_01_data_ingestion import DataIngestionTrainingPipeline
 from stage_02_data_validation import DataValidationTrainingPipeline
@@ -78,7 +79,7 @@ authenticate = PythonOperator(
     op_args= ["speech-emotion-recognition/pipeline/airflow/secrets/gcs_key.json"],
     dag=dag
 )
-q
+
 upload_directory = PythonOperator(
     task_id="upload_directory", 
     python_callable=upload_directory,
