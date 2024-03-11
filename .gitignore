@@ -4,6 +4,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.DS_Store
+*/gcs_key.json
 
 # Datasets (huge!)
 pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
