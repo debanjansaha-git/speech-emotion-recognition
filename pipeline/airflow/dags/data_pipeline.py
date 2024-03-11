@@ -72,6 +72,21 @@ data_validation = PythonOperator(
     dag=dag,
 )
 
+authenticate = PythonOperator(
+    task_id="authenticate", 
+    python_callable=authenticate, 
+    op_args= ["speech-emotion-recognition/pipeline/airflow/secrets/gcs_key.json"],
+    dag=dag
+)
+
+upload_directory = PythonOperator(
+    task_id="upload_directory", 
+    python_callable=upload_directory,
+    op_args = ['mlops-grp3-data-bucket', 'mlops-group3/data'] ,
+    dag=dag
+)
+
+
 # data_transformation = PythonOperator(
 #     task_id="data_transformation",
 #     python_callable=DataTransformationTrainingPipeline().main,
