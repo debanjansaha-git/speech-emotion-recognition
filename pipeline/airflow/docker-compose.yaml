@@ -18,15 +18,15 @@ x-airflow-common:
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session'
     AIRFLOW__SECRETS__BACKEND: airflow.secrets.local_filesystem.LocalFilesystemBackend
     AIRFLOW__SECRETS__BACKEND_KWARGS: '{"variables_file_path": "/opt/secrets/variables.yaml", "connections_file_path": "/opt/secrets/connections.yaml"}'
-    AIRFLOW_UID: ${AIRFLOW_UID:-501}
+    # AIRFLOW_UID: ${AIRFLOW_UID:-0}
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-./src/mlcore/pipeline/airflow}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-./src/mlcore/pipeline/airflow}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-./src/mlcore/pipeline/airflow}/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-./src/mlcore/pipeline/airflow}/secrets:/opt/secrets
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/secrets:/opt/secrets
   networks:
     - airflow
-  user: "${AIRFLOW_UID:-501}:0"
+  user: "${AIRFLOW_UID:-0}:0"
   depends_on:
     &airflow-common-depends-on
     postgres:

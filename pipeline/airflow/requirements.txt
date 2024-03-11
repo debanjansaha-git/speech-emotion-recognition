@@ -1,8 +1,16 @@
-numpy
 pandas
-matplotlib
-seaborn
+mlflow
+numpy
 scikit-learn
-requests
-xgboost
-connexion
+matplotlib
+pyYAML
+tqdm
+ensure==1.0.2
+python-box==6.0.2
+joblib
+types-PyYAML
+Flask
+Flask-Cors
+librosa
+optuna
+# -e .
