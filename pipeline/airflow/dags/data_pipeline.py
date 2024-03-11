@@ -78,7 +78,7 @@ authenticate = PythonOperator(
     op_args= ["speech-emotion-recognition/pipeline/airflow/secrets/gcs_key.json"],
     dag=dag
 )
-
+q
 upload_directory = PythonOperator(
     task_id="upload_directory", 
     python_callable=upload_directory,
