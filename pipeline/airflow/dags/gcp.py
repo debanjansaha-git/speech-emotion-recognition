@@ -1,22 +1,19 @@
+"""
+@Author: Gopi
+"""
 from google.cloud import storage
 from pathlib import Path
 from google.cloud.storage import Client, transfer_manager
 import logging
 import gcsfs
+import os
 
-# Upload only to a Bucket
-# upload a single file
-def upload_file(bucket_name, source_file_name, destination_file_name): 
-    storage_client = storage.Client()
 
-    bucket = storage_client.bucket(bucket_name)
+def authenticate(path_to_key):
+    # set key credentials file path
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path_to_key
+    return True
 
-    blob = bucket.blob(destination_file_name)
-    blob.upload_from_filename(source_file_name)
-# Sample usage
-# upload_file('test_demo_storage_bucket_venky', '/home/venky/imperial-ally-416204-e6815a4b11d5.json', 'test.json')
-
-# Upload a whole directory
 def upload_directory(bucket_name, source_directory, workers=8):
     """Upload every file in a directory, including all files in subdirectories.
 
@@ -69,14 +66,33 @@ def upload_directory(bucket_name, source_directory, workers=8):
         else:
             print("Uploaded {} to {}.".format(name, bucket.name))
 
-# Sample usage
-# upload_directory_with_transfer_manager('test_demo_storage_bucket_venky/test1', '/home/venky/Audio_Song_Actors_01-24',workers=8)
 
 
-# Upload to a particular folder in GCS Bucket
-            
+def upload_file(bucket_name, source_file_name, destination_file_name):
+    """
+    Uploads a file to a specified bucket in Google Cloud Storage.
 
-# upload a single file to a folder
+    Args:
+        bucket_name (str): Name of the bucket to upload the file to.
+        source_file_name (str): Local file path of the file to be uploaded.
+        destination_file_name (str): Name of the file in the bucket.
+
+    Returns:
+        None
+    """
+    # Instantiating a client for Google Cloud Storage
+    storage_client = storage.Client()
+
+    # Getting the specified bucket
+    bucket = storage_client.bucket(bucket_name)
+
+    # Creating a blob object within the bucket
+    blob = bucket.blob(destination_file_name)
+
+    # Uploading the file to the specified blob in the bucket
+    blob.upload_from_filename(source_file_name)
+
+
 def upload_file_to_folder(destination_blob_name, path_to_file, bucket_name, destination_path=""):
     """
     Uploads a single file to a specified folder within a Google Cloud Storage bucket.
@@ -90,7 +106,6 @@ def upload_file_to_folder(destination_blob_name, path_to_file, bucket_name, dest
 
     Returns:
         None
-
     """
     # Explicitly use service account credentials by specifying the private key file.
     storage_client = storage.Client()
@@ -104,30 +119,20 @@ def upload_file_to_folder(destination_blob_name, path_to_file, bucket_name, dest
     # Upload the file from the specified local path to the blob in the bucket.
     blob.upload_from_filename(path_to_file)
 
-## Sample usage
-# upload_file_to_folder('test_in_gcs.txt', 'test.txt', 'test_demo_storage_bucket_venky', 'test1/')
-    
-# upload a directory to a folder
+
 def upload_directory_to_folder(source_directory, gcs_destination):
     """
     Uploads files from a local directory to Google Cloud Storage (GCS).
 
-    Parameters:
-    - src_dir (str): The local directory path containing the files to be uploaded.
-    - gcs_dst (str): The destination path in GCS where the files will be uploaded.
+    Args:
+        source_directory (str): The local directory path containing the files to be uploaded.
+        gcs_destination (str): The destination path in GCS where the files will be uploaded.
 
     Returns:
-    - None
-
-    Example:
-    upload_to_gcs('/path/to/local/directory', 'gs://bucket-name/destination_folder')
+        None
     """
-
     # Initialize Google Cloud Storage Filesystem
     fs = gcsfs.GCSFileSystem()
 
     # Upload files from local directory to GCS destination
     fs.put(source_directory, gcs_destination, recursive=True)
-
-## Sample usage
-# upload_directory_to_folder('/home/venky/Audio_Song_Actors_01-24', "test_demo_storage_bucket_venky/my_folder")
