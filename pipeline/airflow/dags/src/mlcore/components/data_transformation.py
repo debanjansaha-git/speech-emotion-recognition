@@ -215,12 +215,12 @@ class DataTransformation:
         emotions = data["Emotions"]
         logger.warning(" !!!! OVERHEAT ALERT !!!! ")
         logger.warning(" ==== Using Multiprocessors for Data Transformation ====")
-        num_cpus = mp.cpu_count()
+        num_cpus = mp.cpu_count() - 1
         logger.info(f"Number of processors: {str(num_cpus)}")
         start = timeit.default_timer()
         logger.info(f"Multiprocessing started!")
         # Run the loop in parallel
-        results = Parallel(n_jobs=-1)(
+        results = Parallel(n_jobs=-2)(
             delayed(self.process_feature)(path, emotion)
             for (path, emotion) in zip(paths, emotions)
         )

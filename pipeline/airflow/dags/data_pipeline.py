@@ -52,7 +52,7 @@ data_ingestion = PythonOperator(
 upload_data_ingestion = PythonOperator(
     task_id="upload_data_ingestion", 
     python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts', '', "/opt/airflow/config/gcs_key.json", 8] ,
+    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts', '', "/opt/airflow/config/gcs_key.json", 4] ,
     dag=dag
 )
 
