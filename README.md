@@ -193,8 +193,6 @@ python stage_03_data_transformation.py
 
 ## Tools & Technologies
 
-**Google Cloud Platform (GCP)**: Compute Engine, Cloud Storage, BigQuery and Vertex AI Platform for scalable infrastructure, data storage, model training, and deployment. The entire project is planned to implemented in **GCP only** with Google Kubernetes Engine (GKE), however, the project is cloud agnostic, so it can be easily integrated into Microsoft Azure, AWS or others providers and platforms like MinIO.
-
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![YAML](https://img.shields.io/badge/yaml-%23ffffff.svg?style=for-the-badge&logo=yaml&logoColor=151515)
 ![TF](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white) 
@@ -206,6 +204,8 @@ python stage_03_data_transformation.py
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+
+**Google Cloud Platform (GCP)**: Compute Engine, Cloud Storage, BigQuery and Vertex AI Platform for scalable infrastructure, data storage, model training, and deployment. The entire project is planned to implemented in **GCP only** with Google Kubernetes Engine (GKE), however, the project is cloud agnostic, so it can be easily integrated into Microsoft Azure, AWS or others providers and platforms like MinIO.
 
 **Airflow**: Orchestration of data preprocessing and transformation, notification pipelines.
 
