@@ -104,7 +104,7 @@ The entire application is orchestrated by Airflow so running the Docker containe
 
 ### Airflow Pipeline
 
-- Move to the **pipeline->airflow-** directory
+- Move to the **pipeline/airflow** directory
 - With the **airflow** directory as your working directory, run the following command to start airflow in docker one after the other:
 
 ```bash
