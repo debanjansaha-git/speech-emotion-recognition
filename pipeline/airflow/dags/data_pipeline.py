@@ -52,7 +52,7 @@ data_ingestion = PythonOperator(
 upload_data_ingestion = PythonOperator(
     task_id="upload_data_ingestion", 
     python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts', '', "/opt/airflow/config/gcs_key.json"] ,
+    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts', '', "/opt/airflow/config/gcs_key.json", 8] ,
     dag=dag
 )
 
@@ -66,7 +66,7 @@ data_validation = PythonOperator(
 upload_data_validation = PythonOperator(
     task_id="upload_data_validation", 
     python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts/data_validation', 'data_validation/', "/opt/airflow/config/gcs_key.json"] ,
+    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts/data_validation', 'data_validation/', "/opt/airflow/config/gcs_key.json", 4] ,
     dag=dag
 )
 
@@ -81,7 +81,7 @@ data_transformation = PythonOperator(
 upload_data_transformation = PythonOperator(
     task_id="upload_data_transformation", 
     python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts/data_transformation', 'data_transformation/', "/opt/airflow/config/gcs_key.json"] ,
+    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts/data_transformation', 'data_transformation/', "/opt/airflow/config/gcs_key.json", 4] ,
     dag=dag
 )
 
@@ -90,14 +90,11 @@ end_pipeline = EmptyOperator(
     dag=dag,
 )
 
-# Set dependencies between tasks
-(
-    start_pipeline
-    >> data_ingestion
-    # >> upload_data_ingestion
-    >> data_validation
-    # >> upload_data_validation
-    >> data_transformation
-    >> upload_data_transformation
-    >> end_pipeline
-)
+with dag:
+    # Set dependencies between tasks
+    start_pipeline >> data_ingestion
+    data_ingestion >> [data_validation, upload_data_ingestion]
+    data_validation >> [data_transformation, upload_data_validation]
+    data_transformation >> upload_data_transformation
+    upload_data_transformation >> end_pipeline
+    

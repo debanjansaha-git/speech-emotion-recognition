@@ -13,7 +13,7 @@ def authenticate(path_to_key):
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path_to_key
     return True
 
-def upload_directory(bucket_name, source_directory, target_directory='', path_to_key=''):
+def upload_directory(bucket_name, source_directory, target_directory='', path_to_key='', max_workers=8):
     """Upload every file in a directory, including all files in subdirectories.
 
     Args:
@@ -55,7 +55,13 @@ def upload_directory(bucket_name, source_directory, target_directory='', path_to
 
     # Start the upload.
     results = transfer_manager.upload_many_from_filenames(
-        bucket, string_paths, source_directory=source_directory, blob_name_prefix=target_directory, threads=8
+        bucket, 
+        string_paths, 
+        source_directory=source_directory, 
+        blob_name_prefix=target_directory, 
+        worker_type='thread', 
+        max_workers=max_workers, 
+        skip_if_exists=True
     )
 
     for name, result in zip(string_paths, results):
