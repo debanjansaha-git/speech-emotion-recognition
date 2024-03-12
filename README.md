@@ -10,11 +10,18 @@ In today's digital age, understanding human emotions from various sources like a
   - [Folder Structure](#folder-structure)
   - [Datasets](#datasets)
   - [Key Objectives](#key-objectives)
-  - [Data Preprocessing](#data-preprocessing)
+  - [Data Pipeline](#data-pipeline)
+    - [Data Collection](#data-collection)
+    - [Data Loading](#data-loading)
+    - [Data Augmentation](#data-augmentation)
+    - [Feature Extraction](#feature-extraction)
+    - [Data Normalization](#data-normalization)
+    - [Data Splitting](#data-splitting)
+    - [Data Storage](#data-storage)
   - [Instructions](#instructions)
-    - [Core ML Module](#core-ml-module)
     - [Airflow Pipeline](#airflow-pipeline)
     - [MLFlow Pipeline](#mlflow-pipeline)
+    - [Core ML Module](#core-ml-module)
   - [Tools \& Technologies](#tools--technologies)
   - [Contributions](#contributions)
   - [Expected Outcomes](#expected-outcomes)
@@ -31,7 +38,14 @@ The project files are organised as follows:
 
 ## Datasets
 
-Our dataset comprises a diverse collection of audio samples sourced from renowned databases like the Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS), Toronto Emotional Speech Set (TESS), and augmented with custom audio data to enhance the model's robustness across various demographics and contexts.
+Our dataset comprises a diverse collection of audio samples sourced from renowned databases like the Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS), Toronto Emotional Speech Set (TESS), Surrey Audio-Visual Expressed Emotion (SAVEE), and Crowd Sourced Emotional Multimodal Actors Dataset (CREMA-D),  augmented with audio features to enhance the model's robustness across various demographics and contexts.
+
+Here are the Data Cards of the datasets:
+
+1. [RAVDESS](docs/RavdessDataCard.md)
+2. [TESS](docs/TessDataCard.md)
+3. [SAVEE](docs/SaveeDataCard.md)
+4. [CREMA-D](docs/CremaDDataCard.md)
 
 
 ## Key Objectives
@@ -45,56 +59,48 @@ Our dataset comprises a diverse collection of audio samples sourced from renowne
 4. **MLOps Integration**: Implementing best practices in MLOps, we will establish a streamlined workflow for model versioning, monitoring, and continuous integration/continuous deployment (CI/CD) to maintain model performance and reliability over time.
 
 
-## Data Preprocessing
+## Data Pipeline
 
+### Data Collection
+- The datasets are downloaded comprising of audio recordings such as speech samples labeled with corresponding emotions (e.g., happiness, sadness, anger).
+- The dataset (schema) is validated the audio data is of sufficient quality and covers a diverse range of emotions and speakers.
+
+### Data Loading
+- We use audio library (librosa) to load the audio files into memory.
+- Then verify that the audio data is correctly loaded and accessible for further processing.
+
+### Data Augmentation
+- We implement data augmentation techniques to increase the diversity and robustness of the training data.
+- Common augmentation methods include adding noise, time-stretching, shifting, and changing pitch.
+- We experiment with different augmentation strategies to simulate various real-world conditions and speech variations.
+
+### Feature Extraction
+We extract relevant features from the audio data to represent meaningful characteristics for emotion detection.
+
+Common features include `zero-crossing rate` (**ZCR**), `root mean square energy` (**RMSE**), and `Mel-frequency cepstral coefficients` (**MFCCs**).
+
+We use appropriate signal processing techniques and feature extraction libraries (e.g., librosa) to compute the features.
+
+### Data Normalization
+- We normalize the extracted features to ensure that they have consistent scales and distributions.
+- Our normalization techniques include z-score normalization and min-max scaling.
+
+### Data Splitting
+- We finally split the preprocessed data into training, validation, and test sets.
+- We also ensure that each set contains a representative distribution of emotions to prevent bias.
+
+### Data Storage
+- We save the preprocessed data and  corresponding labels in a suitable format (e.g., CSV, parquet) along with compression (e.g, gzip) for easy access during model training.
+- We organize the data into directories or files based on the chosen storage format and directory structure.
+- Finally, the last stage of our data pipeline uploads the data into Google Cloud Storage (GCS) for later retrieval and uses.
 
 
 ## Instructions
 
 Below contains guidance on how to execute the modules.
 
-
-### Core ML Module
-
-
-  > [!WARNING]
-  > All codes/commands have to be executed from the **dags** folder.
-   - Move to the **dags** in project directory
-
-  > [!CAUTION]
-   - In order to execute this module you will need to *build* and *install* the module, otherwise you will get the error
-  ```bash
-  ModuleNotFoundError: No module named 'mlcore'
-  ```
-
-   - Start with installing the dependencies first.
-
-   ```python
-   pip install -r requirements.txt
-   ```
-
-   - Build the module binaries
-
-   ```python
-   python setup.py sdist
-   ```
-
-   - Install the build
-
-   ```python
-   python setup.py install
-   ```
-
-  > [!IMPORTANT]
-  Every time you make some changes in the configurations, you will have to **build the module** manually, so that your changes are reflected. We will later automate this using GitHub Workflows / other CICD options.
-That means you need to run the previous command from the root folder.
-
-
-- In order to run any of the data scripts, use commands:
-```python
-python stage_03_data_transformation.py  
-```
-
+The application has been containerized to reduce the manual execution of comands required for the application to work.
+The entire application is orchestrated by Airflow so running the Docker container for Airflow essentially empowers the execution of the entire application. Here is how to run the Docker container:
 
 ### Airflow Pipeline
 
@@ -135,6 +141,48 @@ This will fire up the MLFlow UI, and open the following link in your browser:
 
 ```python
 python ./src/mlflow/mlflow_trainer.py
+```
+
+### Core ML Module
+
+The modules can also be executed in the local environment. In order to do so, build the module from the `src` directory using `setup.py`. Here is how to build the module:
+
+  > [!WARNING]
+  > All codes/commands have to be executed from the **pipeline->airflow->dags** folder.
+   - Move to the **dags** in project directory
+
+  > [!IMPORTANT]
+  > In order to execute this module you will need to *build* and *install* the module as a package, otherwise you will get the error
+  ```bash
+  ModuleNotFoundError: No module named 'mlcore'
+  ```
+
+   - Start with installing the dependencies first.
+
+   ```python
+   pip install -r requirements.txt
+   ```
+
+   - Build the module binaries
+
+   ```python
+   python setup.py sdist
+   ```
+
+   - Install the build
+
+   ```python
+   python setup.py install
+   ```
+
+  > [!IMPORTANT]
+  Every time you make some changes in the configurations, you will have to **build the module** manually, so that your changes are reflected. We will later automate this using GitHub Workflows / other CICD options.
+That means you need to run the previous command from the root folder.
+
+
+- In order to run any of the data scripts, use commands:
+```python
+python stage_03_data_transformation.py  
 ```
 
 ## Tools & Technologies
@@ -188,5 +236,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 The dags, logs, plugins and secrets folders are copied into the container and are updated in real-time. Any changes you make to the files inside these folders will reflect inside the container.
 
-So by modifying the code inside the dags folder, we can add and develop varous dags. For instance, we can add a new dag which can download the data and preprocess it inside the dags folder and it will automatically be picked up airflow's services.
+
 
