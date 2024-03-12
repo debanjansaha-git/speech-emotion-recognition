@@ -1,0 +1,32 @@
+stages:
+  data_ingestion:
+    cmd: python pipeline/airflow/dags/stage_01_data_ingestion.py
+    deps:
+      - pipeline/airflow/dags/stage_01_data_ingestion.py
+      - pipeline/airflow/dags/src/mlcore/config/config.yaml
+    outs:
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/Actor*
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/savee/ALL/*
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
+
+  data_validation:
+    cmd: python pipeline/airflow/dags/stage_02_data_validation.py
+    deps:
+      - pipeline/airflow/dags/stage_02_data_validation.py
+      - pipeline/airflow/dags/src/mlcore/config/config.yaml
+    outs:
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_validation/metadata.csv
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_validation/status.txt
+
+  data_transformation:
+    cmd: python pipeline/airflow/dags/stage_03_data_transformation.py
+    deps:
+      - pipeline/airflow/dags/stage_03_data_transformation.py
+      - pipeline/airflow/dags/src/mlcore/config/config.yaml
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_validation/metadata.csv
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_validation/status.txt
+    outs:
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/emotions.parquet.gzip
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/train.parquet.gzip
+      - pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/test.parquet.gzip
