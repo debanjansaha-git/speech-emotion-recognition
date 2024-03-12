@@ -5,7 +5,6 @@ from google.cloud import storage
 from pathlib import Path
 from google.cloud.storage import Client, transfer_manager
 import logging
-import gcsfs
 import os
 
 
@@ -14,7 +13,7 @@ def authenticate(path_to_key):
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path_to_key
     return True
 
-def upload_directory(bucket_name, source_directory, workers=8):
+def upload_directory(bucket_name, source_directory, target_directory='', path_to_key=''):
     """Upload every file in a directory, including all files in subdirectories.
 
     Args:
@@ -31,6 +30,7 @@ def upload_directory(bucket_name, source_directory, workers=8):
 
     """
     
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path_to_key
     storage_client = Client()
     bucket = storage_client.bucket(bucket_name)
 
@@ -50,12 +50,12 @@ def upload_directory(bucket_name, source_directory, workers=8):
     # Finally, convert them all to strings.
     string_paths = [str(path) for path in relative_paths]
 
-    logging.debug("Found {} files.".format(len(string_paths)))
+    logging.info("Found {} files.".format(len(string_paths)))
     # print("Found {} files.".format(len(string_paths)))
 
     # Start the upload.
     results = transfer_manager.upload_many_from_filenames(
-        bucket, string_paths, source_directory=source_directory, max_workers=workers
+        bucket, string_paths, source_directory=source_directory, blob_name_prefix=target_directory, threads=8
     )
 
     for name, result in zip(string_paths, results):
@@ -120,19 +120,19 @@ def upload_file_to_folder(destination_blob_name, path_to_file, bucket_name, dest
     blob.upload_from_filename(path_to_file)
 
 
-def upload_directory_to_folder(source_directory, gcs_destination):
-    """
-    Uploads files from a local directory to Google Cloud Storage (GCS).
+# def upload_directory_to_folder(source_directory, gcs_destination):
+#     """
+#     Uploads files from a local directory to Google Cloud Storage (GCS).
 
-    Args:
-        source_directory (str): The local directory path containing the files to be uploaded.
-        gcs_destination (str): The destination path in GCS where the files will be uploaded.
+#     Args:
+#         source_directory (str): The local directory path containing the files to be uploaded.
+#         gcs_destination (str): The destination path in GCS where the files will be uploaded.
 
-    Returns:
-        None
-    """
-    # Initialize Google Cloud Storage Filesystem
-    fs = gcsfs.GCSFileSystem()
+#     Returns:
+#         None
+#     """
+#     # Initialize Google Cloud Storage Filesystem
+#     fs = gcsfs.GCSFileSystem()
 
-    # Upload files from local directory to GCS destination
-    fs.put(source_directory, gcs_destination, recursive=True)
+#     # Upload files from local directory to GCS destination
+#     fs.put(source_directory, gcs_destination, recursive=True)

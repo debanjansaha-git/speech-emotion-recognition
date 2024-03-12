@@ -12,5 +12,7 @@ types-PyYAML
 Flask
 Flask-Cors
 librosa
+soundfile
 optuna
+google-cloud-storage
 # -e .
