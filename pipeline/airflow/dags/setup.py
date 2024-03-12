@@ -3,9 +3,9 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 
-REPO_NAME = "mlops-group3"
+REPO_NAME = "speech-emotion-recognition"
 AUTHOR_USER_NAME = "debanjansaha-git"
 SRC_REPO = "mlcore"
 AUTHOR_EMAIL = "debanjansh@gmail.com"
@@ -15,7 +15,7 @@ setuptools.setup(
     version=__version__,
     author=AUTHOR_USER_NAME,
     author_email=AUTHOR_EMAIL,
-    description="A simple Python MLOps app",
+    description="Speech Emotion Recognition (SER) MLOps Application",
     long_description=long_description,
     long_description_content="text/markdown",
     url=f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}",
