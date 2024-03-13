@@ -1,0 +1,5 @@
+outs:
+- md5: bad31e032027cadfee1eec55f2785aea
+  size: 95990
+  hash: md5
+  path: OAF_tough_happy.wav

@@ -1,0 +1,5 @@
+outs:
+- md5: 19a868ca5da98d763463c9dae94aa54e
+  size: 103500
+  hash: md5
+  path: OAF_ring_happy.wav

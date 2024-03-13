@@ -1,0 +1,5 @@
+outs:
+- md5: 9dc31ac3df899f3d7783ac02c6731d0e
+  size: 105708
+  hash: md5
+  path: OAF_peg_happy.wav
