@@ -225,6 +225,26 @@ class DataTransformation:
     """
 
     def __init__(self, config: DataTransformationConfig):
+        """
+        Class for data transformation.
+
+        Summary:
+            This class handles the transformation of data using audio augmentation and feature extraction techniques.
+
+        Explanation:
+            The DataTransformation class takes a DataTransformationConfig object as input and provides methods for audio augmentation and feature extraction.
+            It initializes the AudioAugmenter and FeatureExtractor classes and uses the specified configuration parameters for data transformation.
+
+        Args:
+            config (DataTransformationConfig): The configuration object containing the necessary parameters for data transformation.
+
+        Methods:
+            None.
+
+        Raises:
+            None.
+        """
+
         self.config = config
         # Audio Augmentation & Feature Extraction
         self.aug = AudioAugmenter()
@@ -235,6 +255,28 @@ class DataTransformation:
         self.tfx_params = tfx_params["data_transforms"]["params"]
 
     def get_features(self, path, duration=2.5, offset=0.6):
+        """
+        Function for extracting features from audio data.
+
+        Summary:
+            This function extracts features from audio data using various transformation techniques.
+
+        Explanation:
+            The get_features() function takes an audio file path as input and extracts features from the audio data.
+            It applies different transformation techniques such as adding noise, time stretching, and pitch shifting to the audio data.
+            The function returns a feature array containing the extracted features.
+
+        Args:
+            path (str): The path to the audio file.
+            duration (float): The duration of the audio segment to consider (default: 2.5 seconds).
+            offset (float): The offset from the beginning of the audio file to start the segment (default: 0.6 seconds).
+
+        Returns:
+            np.ndarray: The feature array containing the extracted features.
+
+        Raises:
+            None.
+        """
 
         # Load data
         data, sr = librosa.load(path, duration=duration, offset=offset)
@@ -316,6 +358,28 @@ class DataTransformation:
         return audio
 
     def process_feature(self, path, emotion):
+        """
+        Function for processing a single audio feature.
+
+        Summary:
+            This function processes a single audio file by extracting features and associating them with a specified emotion label.
+
+        Explanation:
+            The process_feature() function takes an audio file path and an emotion label as input.
+            It calls the get_features() function to extract features from the audio file and associates them with the specified emotion label.
+            The function returns the feature array and emotion labels.
+
+        Args:
+            path (str): The path to the audio file.
+            emotion (str): The emotion label associated with the audio file.
+
+        Returns:
+            Tuple[List[np.ndarray], List[str]]: The feature array and emotion labels.
+
+        Raises:
+            None.
+        """
+
         features = self.get_features(path)
         X = []
         Y = []
@@ -325,6 +389,28 @@ class DataTransformation:
         return X, Y
 
     def feature_engineering(self):
+        """
+        Function for feature engineering.
+
+        Summary:
+            This function performs feature engineering on audio data.
+
+        Explanation:
+            The feature_engineering() function takes the root directory and metadata path as input.
+            It reads the metadata file, drops any rows with missing values, and extracts features from the audio data.
+            The function saves the feature array to disk and returns descriptive statistics of the data.
+
+        Args:
+            root_dir (str): The root directory path.
+            metadata_dir (str): The path to the metadata file.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
+
         root_dir = self.config.root_dir
         metadata_dir = self.config.metadata_path
 
@@ -380,6 +466,27 @@ class DataTransformation:
         )
 
     def train_test_split_data(self, test_size=0.2):
+        """
+        Function for splitting data into train and test sets.
+
+        Summary:
+            This function splits the data into train and test sets.
+
+        Explanation:
+            The train_test_split_data() function takes the output path and test size as input.
+            It reads the data from the output path, splits it into train and test sets using the specified test size,
+            and saves the train and test sets to disk.
+
+        Args:
+            test_size (float): The proportion of the data to include in the test set (default: 0.2).
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
+
         emotions_df = pd.read_parquet(self.config.output_path)
         train, test = train_test_split(
             emotions_df, test_size=test_size, random_state=42

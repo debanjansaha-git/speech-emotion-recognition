@@ -42,6 +42,26 @@ class DataIngestion:
         self.config = config
 
     def download_data(self):
+        """
+        Function for downloading data.
+
+        Summary:
+            This function handles the downloading of data from a specified source URL.
+
+        Explanation:
+            The download_data() function downloads data from a specified source URL and saves it to the local data path.
+            If the local data path is not empty, the function skips the download process.
+
+        Args:
+            self: The instance of the class.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
+
         if len(os.listdir(self.config.local_data_path)) == 0:
             directory, download_url_encoded = self.config.source_URL.split(":")
             download_url = unquote(download_url_encoded)

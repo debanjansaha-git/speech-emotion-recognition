@@ -11,12 +11,71 @@ from mlcore.entity.config_entity import (
 
 
 class ConfigurationManager:
+    """
+    Class for managing configuration.
+
+    Summary:
+        This class handles the management of configuration files and provides methods to retrieve specific configuration objects.
+
+    Explanation:
+        The ConfigurationManager class reads and manages configuration files for data ingestion, validation, transformation, model training, and model evaluation.
+        The class takes optional file paths for the configuration, parameters, and schema files.
+        It provides methods to retrieve specific configuration objects for data ingestion, data validation, data transformation, model training, and model evaluation.
+
+    Methods:
+        get_data_ingestion_config() -> List[DataIngestionConfig]:
+            Retrieves a list of DataIngestionConfig objects for each data ingestion configuration.
+
+        get_data_validation_config() -> DataValidationConfig:
+            Retrieves the DataValidationConfig object for data validation.
+
+        get_data_transformation_config() -> DataTransformationConfig:
+            Retrieves the DataTransformationConfig object for data transformation.
+
+        get_model_trainer_config() -> ModelTrainerConfig:
+            Retrieves the ModelTrainerConfig object for model training.
+
+        get_model_evaluation_config() -> ModelEvaluationConfig:
+            Retrieves the ModelEvaluationConfig object for model evaluation.
+
+    Raises:
+        None.
+
+    Examples:
+        config_manager = ConfigurationManager()
+        data_ingestion_config = config_manager.get_data_ingestion_config()
+        data_validation_config = config_manager.get_data_validation_config()
+        data_transformation_config = config_manager.get_data_transformation_config()
+        model_trainer_config = config_manager.get_model_trainer_config()
+        model_evaluation_config = config_manager.get_model_evaluation_config()
+    """
+
     def __init__(
         self,
         config_filepath=CONFIG_FILE_PATH,
         params_filepath=PARAMS_FILE_PATH,
         schema_filepath=SCHEMA_FILE_PATH,
     ):
+        """
+        Class for configuration management.
+
+        Summary:
+            This class handles the management of configuration parameters.
+
+        Explanation:
+            The ConfigurationManager class is responsible for reading and managing configuration parameters.
+            It initializes the configuration, parameters, and schema from the specified file paths.
+            It also creates the necessary directories for artifacts.
+
+        Attributes:
+            config (dict): The configuration parameters.
+            params The file (dict): The parameter values.
+            schema (dict): The schema definition.
+
+        Methods:
+            None.
+        """
+
         self.config = read_yaml(config_filepath)
         self.params = read_yaml(params_filepath)
         self.schema = read_yaml(schema_filepath)
@@ -24,6 +83,23 @@ class ConfigurationManager:
         create_directories([self.config.artifacts_root])
 
     def get_data_ingestion_config(self) -> list:
+        """
+        Method for retrieving the data ingestion configuration.
+
+        Summary:
+            This method retrieves the data ingestion configuration.
+
+        Explanation:
+            The get_data_ingestion_config() method returns a list of data ingestion configurations.
+            It creates DataIngestionConfig objects for each data ingestion configuration and appends them to the list.
+
+        Returns:
+            list: A list of DataIngestionConfig objects representing the data ingestion configurations.
+
+        Raises:
+            None.
+        """
+
         config_list = [
             self.config.data_ingestion_ravdess,
             self.config.data_ingestion_tess,
@@ -42,6 +118,23 @@ class ConfigurationManager:
         return data_ingestion_config_list
 
     def get_data_validation_config(self) -> DataValidationConfig:
+        """
+        Method for retrieving the data validation configuration.
+
+        Summary:
+            This method retrieves the data validation configuration.
+
+        Explanation:
+            The get_data_validation_config() method returns a DataValidationConfig object representing the data validation configuration.
+            It creates a DataValidationConfig object using the specified configuration parameters.
+
+        Returns:
+            DataValidationConfig: The data validation configuration.
+
+        Raises:
+            None.
+        """
+
         config = self.config.data_validation
         schema = self.schema.COLUMNS
 
@@ -61,6 +154,23 @@ class ConfigurationManager:
         return data_validation_config
 
     def get_data_transformation_config(self) -> DataTransformationConfig:
+        """
+        Method for retrieving the data transformation configuration.
+
+        Summary:
+            This method retrieves the data transformation configuration.
+
+        Explanation:
+            The get_data_transformation_config() method returns a DataTransformationConfig object representing the data transformation configuration.
+            It creates a DataTransformationConfig object using the specified configuration parameters.
+
+        Returns:
+            DataTransformationConfig: The data transformation configuration.
+
+        Raises:
+            None.
+        """
+
         config = self.config.data_transformation
 
         create_directories([config.root_dir])
@@ -76,6 +186,23 @@ class ConfigurationManager:
         return data_transformation_config
 
     def get_model_trainer_config(self) -> ModelTrainerConfig:
+        """
+        Method for retrieving the model trainer configuration.
+
+        Summary:
+            This method retrieves the model trainer configuration.
+
+        Explanation:
+            The get_model_trainer_config() method returns a ModelTrainerConfig object representing the model trainer configuration.
+            It creates a ModelTrainerConfig object using the specified configuration parameters.
+
+        Returns:
+            ModelTrainerConfig: The model trainer configuration.
+
+        Raises:
+            None.
+        """
+
         config = self.config.model_trainer
         params = self.params.model_params
         schema = self.schema.TARGET_COLUMN
@@ -94,6 +221,23 @@ class ConfigurationManager:
         return model_trainer_config
 
     def get_model_evaluation_config(self):
+        """
+        Method for retrieving the model evaluation configuration.
+
+        Summary:
+            This method retrieves the model evaluation configuration.
+
+        Explanation:
+            The get_model_evaluation_config() method returns a ModelEvaluationConfig object representing the model evaluation configuration.
+            It creates a ModelEvaluationConfig object using the specified configuration parameters.
+
+        Returns:
+            ModelEvaluationConfig: The model evaluation configuration.
+
+        Raises:
+            None.
+        """
+
         config = self.config.model_evaluation
         schema = self.schema.TARGET_COLUMN
         params = self.params.model_parans

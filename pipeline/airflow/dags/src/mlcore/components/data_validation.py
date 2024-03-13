@@ -24,6 +24,24 @@ class DataValidation:
         self.config = config
 
     def generate_metadata(self) -> bool:
+        """
+        Function for generating metadata.
+
+        Summary:
+            This function generates metadata by processing and combining multiple datasets.
+
+        Explanation:
+            The generate_metadata() function reads and processes multiple datasets, including RAVDESS, TESS, CREMAD, and SAVEE.
+            It extracts features from the audio data, combines the datasets, and saves the metadata to disk.
+            The function also performs column validation against a metadata schema.
+
+        Returns:
+            bool: The validation status indicating whether the metadata generation was successful or not.
+
+        Raises:
+            Any exceptions that occur during the metadata generation process.
+        """
+
         try:
             output_dir = self.config.local_output_path
 
@@ -241,6 +259,28 @@ class DataValidation:
             raise e
 
     def _validate_columns(self, data_df: pd.DataFrame) -> bool:
+        """
+        Function for validating columns against a metadata schema.
+
+        Summary:
+            This function validates the columns of a DataFrame against a metadata schema.
+
+        Explanation:
+            The _validate_columns() function takes a DataFrame and a metadata schema as input.
+            It compares the columns of the DataFrame with the metadata schema and returns a validation status.
+            The validation status indicates whether the columns of the DataFrame match the metadata schema or not.
+
+        Args:
+            data_df (pd.DataFrame): The DataFrame to validate.
+            metadata_schema (list): The list of column names in the metadata schema.
+
+        Returns:
+            bool: The validation status indicating whether the columns of the DataFrame match the metadata schema or not.
+
+        Raises:
+            Any exceptions that occur during the column validation process.
+        """
+
         try:
             validation_status = None
             data_cols = list(data_df.columns)
