@@ -25,7 +25,7 @@ class DataValidation:
             for folder in directory_list:
                 if folder.startswith("Actor_"):
                     actor_path = os.path.join(data_dir, folder)
-                    actor_files = os.listdir(actor_path)
+                    actor_files = [file for file in os.listdir(actor_path) if file.endswith('.wav')] 
                     for file in actor_files:
                         part = file.split(".")[0].split("-")
                         file_emotion.append(int(part[2]))
@@ -80,7 +80,7 @@ class DataValidation:
             for folder in directory_list:
                 if folder.startswith("YAF_") or folder.startswith("OAF_"):
                     actor_path = os.path.join(data_dir, folder)
-                    actor_files = os.listdir(actor_path)
+                    actor_files = [file for file in os.listdir(actor_path) if file.endswith('.wav')]
                     for file in actor_files:
                         part = file.split(".")[0].split("_")
                         file_emotion.append(
@@ -111,7 +111,7 @@ class DataValidation:
             ### =================================================================
 
             data_dir = self.config.unzip_cremad_dir
-            directory_list = os.listdir(data_dir)
+            directory_list = [file for file in os.listdir(data_dir) if file.endswith('.wav')]
             file_emotion = []
             file_emotion_intensity = []
             emotion_actor_number = []
@@ -154,7 +154,7 @@ class DataValidation:
             ### =================================================================
 
             data_dir = self.config.unzip_savee_dir
-            directory_list = os.listdir(data_dir)
+            directory_list = [file for file in os.listdir(data_dir) if file.endswith('.wav')]
             file_emotion = []
             file_emotion_intensity = []
             emotion_actor_number = []
