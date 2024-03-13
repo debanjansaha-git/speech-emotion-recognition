@@ -11,6 +11,45 @@ from mlcore.entity.config_entity import (
 
 
 class ConfigurationManager:
+    """
+    Class for managing configuration.
+
+    Summary:
+        This class handles the management of configuration files and provides methods to retrieve specific configuration objects.
+
+    Explanation:
+        The ConfigurationManager class reads and manages configuration files for data ingestion, validation, transformation, model training, and model evaluation.
+        The class takes optional file paths for the configuration, parameters, and schema files.
+        It provides methods to retrieve specific configuration objects for data ingestion, data validation, data transformation, model training, and model evaluation.
+
+    Methods:
+        get_data_ingestion_config() -> List[DataIngestionConfig]:
+            Retrieves a list of DataIngestionConfig objects for each data ingestion configuration.
+
+        get_data_validation_config() -> DataValidationConfig:
+            Retrieves the DataValidationConfig object for data validation.
+
+        get_data_transformation_config() -> DataTransformationConfig:
+            Retrieves the DataTransformationConfig object for data transformation.
+
+        get_model_trainer_config() -> ModelTrainerConfig:
+            Retrieves the ModelTrainerConfig object for model training.
+
+        get_model_evaluation_config() -> ModelEvaluationConfig:
+            Retrieves the ModelEvaluationConfig object for model evaluation.
+
+    Raises:
+        None.
+
+    Examples:
+        config_manager = ConfigurationManager()
+        data_ingestion_config = config_manager.get_data_ingestion_config()
+        data_validation_config = config_manager.get_data_validation_config()
+        data_transformation_config = config_manager.get_data_transformation_config()
+        model_trainer_config = config_manager.get_model_trainer_config()
+        model_evaluation_config = config_manager.get_model_evaluation_config()
+    """
+
     def __init__(
         self,
         config_filepath=CONFIG_FILE_PATH,

@@ -7,6 +7,29 @@ STAGE_NAME = "data transformation stage"
 
 
 class DataTransformationTrainingPipeline:
+    """
+    Class for data transformation training pipeline.
+
+    Summary:
+        This class represents the data transformation training pipeline.
+
+    Explanation:
+        The DataTransformationTrainingPipeline class provides a main method to execute the data transformation training pipeline.
+        It initializes the ConfigurationManager and retrieves the data transformation configuration.
+        It then performs data transformation and model training by calling the DataTransformation and ModelTrainer classes.
+
+    Methods:
+        main():
+            Executes the data transformation training pipeline by initializing the ConfigurationManager and performing data transformation and model training.
+
+    Raises:
+        Any exceptions that occur during the data transformation training pipeline.
+
+    Examples:
+        pipeline = DataTransformationTrainingPipeline()
+        pipeline.main()
+    """
+
     def __init__(self):
         pass
 
