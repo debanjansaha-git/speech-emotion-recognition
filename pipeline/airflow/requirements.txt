@@ -15,4 +15,5 @@ librosa
 soundfile
 optuna
 google-cloud-storage
+dvc
 # -e .
