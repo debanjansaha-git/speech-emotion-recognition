@@ -17,6 +17,47 @@ np.random.seed(42)
 
 
 class AudioAugmenter:
+    """
+    Class for audio data augmentation.
+
+    Summary:
+        This class provides methods to augment audio data by adding noise, time-stretching, shifting, and changing pitch.
+
+    Explanation:
+        The AudioAugmenter class contains methods to apply various augmentation techniques to audio data.
+        The noise() method adds additive white Gaussian noise (AWGN) to the audio data, providing a more realistic simulation of background noise or environmental conditions.
+        The stretch() method time-stretches the audio data by a specified rate using the time_stretch function.
+        The shift() method shifts the audio data by a random amount within a certain range, simulating changes in timing or alignment.
+        The pitch() method changes the pitch of the audio data by a specified number of steps using the pitch_shift function.
+        The class takes an optional noise_std parameter, which controls the standard deviation of the Gaussian noise added in the noise() method.
+
+    Methods:
+        noise(data: np.ndarray) -> np.ndarray:
+            Adds additive white Gaussian noise (AWGN) to the audio data and returns the augmented data.
+
+        stretch(data: np.ndarray, rate: float = 0.8) -> np.ndarray:
+            Time-stretches the audio data by the specified rate and returns the augmented data.
+
+        shift(data: np.ndarray) -> np.ndarray:
+            Shifts the audio data by a random amount within a certain range and returns the augmented data.
+
+        pitch(data: np.ndarray, sampling_rate: int, n_steps: int = 3) -> np.ndarray:
+            Changes the pitch of the audio data by the specified number of steps and returns the augmented data.
+
+    Args:
+        data (np.ndarray): The input audio data.
+        rate (float, optional): The rate of time-stretching. Default is 0.8.
+        sampling_rate (int): The sampling rate of the audio data.
+        n_steps (int, optional): The number of steps to change the pitch. Default is 3.
+
+    Returns:
+        np.ndarray: The augmented audio data.
+
+    Examples:
+        augmenter = AudioAugmenter()
+        augmented_data = augmenter.noise(data)
+    """
+
     def __init__(self, noise_std=0.035):
         self.noise_std = noise_std
 
@@ -55,6 +96,44 @@ class AudioAugmenter:
 
 
 class FeatureExtractor:
+    """
+    Class for feature extraction.
+
+    Summary:
+        This class provides methods to extract various audio features from input data.
+
+    Explanation:
+        The FeatureExtractor class contains methods to extract features such as zero-crossing rate (ZCR), root mean square energy (RMSE),
+        and Mel-frequency cepstral coefficients (MFCC) from audio data. The extract_features() method combines these features into a single array
+        and returns the result. The class takes optional parameters for frame length and hop length, which control the size and overlap of the analysis windows.
+
+    Methods:
+        extract_features(data: np.ndarray, sr: int = 22050) -> np.ndarray:
+            Extracts audio features from the input data and returns the combined feature array.
+
+    Private Methods:
+        __zcr__(data: np.ndarray) -> np.ndarray:
+            Calculates the zero-crossing rate (ZCR) feature from the input data and returns the result.
+
+        __rmse__(data: np.ndarray) -> np.ndarray:
+            Calculates the root mean square energy (RMSE) feature from the input data and returns the result.
+
+        __mfcc__(data: np.ndarray, sr: int, flatten: bool = True) -> np.ndarray:
+            Calculates the Mel-frequency cepstral coefficients (MFCC) feature from the input data and returns the result.
+            The flatten parameter determines whether to flatten the MFCC array or not. Default is True.
+
+    Args:
+        data (np.ndarray): The input audio data.
+        sr (int, optional): The sample rate of the audio data. Default is 22050.
+
+    Returns:
+        np.ndarray: The combined feature array extracted from the input data.
+
+    Examples:
+        feature_extractor = FeatureExtractor()
+        features = feature_extractor.extract_features(data)
+    """
+
     def __init__(self, frame_length=2048, hop_length=512):
         self.frame_length = frame_length
         self.hop_length = hop_length
@@ -97,12 +176,52 @@ class FeatureExtractor:
 
 class DataTransformation:
     """
-    Transforms the data by augmenting it with standard audio augmentation transforms
+    Class for data transformation.
 
-    Justification:
-    https://aws.amazon.com/what-is/data-augmentation/
-    Audio transformations typically include injecting random or Gaussian noise into some audio,
-    fast-forwarding parts, changing the speed of parts by a fixed rate, or altering the pitch.
+    Summary:
+        This class handles the transformation of audio data by applying various augmentation techniques and extracting features.
+
+    Explanation:
+        The DataTransformation class provides methods to transform audio data by adding noise, time-stretching, shifting, and changing pitch.
+        It also includes methods for feature extraction from the transformed audio data.
+        The class takes a DataTransformationConfig object as input, which contains the necessary configuration parameters for data transformation.
+        The get_features() method loads audio data from a specified path and extracts features using the FeatureExtractor class.
+        The process_feature() method processes a single audio file by extracting features and associating them with a specified emotion label.
+        The feature_engineering() method performs data transformation and feature extraction on a dataset in parallel using multiprocessing.
+        The train_test_split_data() method splits the transformed dataset into train and test sets.
+        Transforms the data by augmenting it with standard audio augmentation transforms
+
+        Justification:
+        https://aws.amazon.com/what-is/data-augmentation/
+        Audio transformations typically include injecting random or Gaussian noise into some audio,
+        fast-forwarding parts, changing the speed of parts by a fixed rate, or altering the pitch.
+
+    Args:
+        config (DataTransformationConfig): The configuration object containing the necessary parameters for data transformation.
+
+    Methods:
+        get_features(path: str, duration: float = 2.5, offset: float = 0.6) -> np.ndarray:
+            Loads audio data from the specified path, extracts features, and returns the feature array.
+
+        process_feature(path: str, emotion: str) -> Tuple[List[np.ndarray], List[str]]:
+            Processes a single audio file by extracting features and associating them with the specified emotion label.
+            Returns the feature array and emotion labels.
+
+        feature_engineering():
+            Performs data transformation and feature extraction on the dataset in parallel using multiprocessing.
+
+        train_test_split_data(test_size: float = 0.2):
+            Splits the transformed dataset into train and test sets and saves them to disk.
+
+    Raises:
+        No transformation parameters specified: If no transformation parameters are specified in the configuration.
+
+    Examples:
+        data_transformation = DataTransformation(config)
+        features = data_transformation.get_features(path)
+        X, Y = data_transformation.process_feature(path, emotion)
+        data_transformation.feature_engineering()
+        data_transformation.train_test_split_data(test_size)
     """
 
     def __init__(self, config: DataTransformationConfig):
