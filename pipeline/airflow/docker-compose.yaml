@@ -63,6 +63,19 @@ x-airflow-common:
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__WEBSERVER__SECRET_KEY: 'abcdefghij'
     AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: 'true'
+
+    ## SMTP Environment variables
+    AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+    AIRFLOW__SMTP__SMTP_STARTTLS: True
+    AIRFLOW__SMTP__SMTP_SSL: False
+    AIRFLOW__SMTP__SMTP_USER: venkateshgopi24@gmail.com
+    AIRFLOW__SMTP__SMTP_PASSWORD: flsk peoo gncm dsdd
+    AIRFLOW__SMTP__SMTP_PORT: 587
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: venkateshgopi24@gmail.com
+    AIRFLOW__SMTP__SMTP_RETRY_LIMIT: 5
+    AIRFLOW__SMTP__SMTP_TIMEOUT: 30
+    ## 
+
     # AIRFLOW__SCHEDULER__LOCAL_TASK_JOB_HEARTBEAT_SEC: 3000
     # AIRFLOW__SCHEDULER__SCHEDULER_ZOMBIE_TASK_THRESHOLD: 500
     # AIRFLOW__SCHEDULER__ZOMBIE_DETECTION_INTERVAL: 500
