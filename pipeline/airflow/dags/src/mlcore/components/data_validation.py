@@ -6,6 +6,20 @@ from mlcore.entity.config_entity import DataValidationConfig
 
 
 class DataValidation:
+    """
+    Class for data validation.
+
+    Summary:
+        This class handles the validation of data using the specified configuration.
+
+    Explanation:
+        The DataValidation class provides a method to validate data based on the given configuration.
+        The class takes a DataValidationConfig object as input, which contains the necessary configuration parameters for data validation.
+
+    Args:
+        config (DataValidationConfig): The configuration object containing the necessary parameters for data validation.
+    """
+
     def __init__(self, config: DataValidationConfig):
         self.config = config
 
@@ -25,7 +39,9 @@ class DataValidation:
             for folder in directory_list:
                 if folder.startswith("Actor_"):
                     actor_path = os.path.join(data_dir, folder)
-                    actor_files = [file for file in os.listdir(actor_path) if file.endswith('.wav')] 
+                    actor_files = [
+                        file for file in os.listdir(actor_path) if file.endswith(".wav")
+                    ]
                     for file in actor_files:
                         part = file.split(".")[0].split("-")
                         file_emotion.append(int(part[2]))
@@ -80,7 +96,9 @@ class DataValidation:
             for folder in directory_list:
                 if folder.startswith("YAF_") or folder.startswith("OAF_"):
                     actor_path = os.path.join(data_dir, folder)
-                    actor_files = [file for file in os.listdir(actor_path) if file.endswith('.wav')]
+                    actor_files = [
+                        file for file in os.listdir(actor_path) if file.endswith(".wav")
+                    ]
                     for file in actor_files:
                         part = file.split(".")[0].split("_")
                         file_emotion.append(
@@ -111,7 +129,9 @@ class DataValidation:
             ### =================================================================
 
             data_dir = self.config.unzip_cremad_dir
-            directory_list = [file for file in os.listdir(data_dir) if file.endswith('.wav')]
+            directory_list = [
+                file for file in os.listdir(data_dir) if file.endswith(".wav")
+            ]
             file_emotion = []
             file_emotion_intensity = []
             emotion_actor_number = []
@@ -154,7 +174,9 @@ class DataValidation:
             ### =================================================================
 
             data_dir = self.config.unzip_savee_dir
-            directory_list = [file for file in os.listdir(data_dir) if file.endswith('.wav')]
+            directory_list = [
+                file for file in os.listdir(data_dir) if file.endswith(".wav")
+            ]
             file_emotion = []
             file_emotion_intensity = []
             emotion_actor_number = []

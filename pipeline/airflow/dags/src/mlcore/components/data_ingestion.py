@@ -15,6 +15,29 @@ CHUNK_SIZE = 40960
 
 
 class DataIngestion:
+    """
+    Class for data ingestion.
+
+    Summary:
+        This class handles the downloading and extraction of data from a specified source URL.
+
+    Explanation:
+        The DataIngestion class provides a method, download_data(), which downloads and extracts data from a specified source URL.
+        If the local data path is empty, the download_data() method retrieves the data from the source URL, saves it to the local data path,
+        and extracts the data if it is compressed. If the local data path is not empty, the method skips the download process.
+        The class takes a DataIngestionConfig object as input, which contains the necessary configuration parameters for data ingestion.
+
+    Args:
+        config (DataIngestionConfig): The configuration object containing the necessary parameters for data ingestion.
+
+    Methods:
+        download_data(): Downloads and extracts data from the specified source URL.
+
+    Raises: HTTPError: If there is an error while downloading the data from the source URL. OSError: If there is an error while saving the data to the local data path.
+
+    Examples: data_ingestion = DataIngestion(config) data_ingestion.download_data()
+    """
+
     def __init__(self, config: DataIngestionConfig):
         self.config = config
 

@@ -13,6 +13,37 @@ import timeit
 
 
 class ModelTrainer:
+    """
+    Class for model training.
+
+    Summary:
+        This class handles the training of a Random Forest model using the specified configuration.
+
+    Explanation:
+        The ModelTrainer class provides methods to train a Random Forest model.
+        The class takes a ModelTrainerConfig object as input, which contains the necessary configuration parameters for model training.
+        The hp_tune() method performs hyperparameter tuning using Optuna to find the best set of hyperparameters for the model.
+        The train() method trains the Random Forest model using the specified hyperparameters and saves the trained model to disk.
+
+    Args:
+        config (ModelTrainerConfig): The configuration object containing the necessary parameters for model training.
+
+    Methods:
+        hp_tune(trial: optuna.Trial, xtrain: np.ndarray, ytrain: np.ndarray) -> float:
+            Performs hyperparameter tuning using Optuna and returns the accuracy score.
+
+        train(hypertune: bool = True):
+            Trains the Random Forest model using the specified hyperparameters and saves the trained model to disk.
+
+    Raises:
+        No transformation parameters specified: If no transformation parameters are specified in the configuration.
+
+    Examples:
+        model_trainer = ModelTrainer(config)
+        accuracy = model_trainer.hp_tune(trial, x_train, y_train)
+        model_trainer.train(hypertune=True)
+    """
+
     def __init__(self, config: ModelTrainerConfig):
         self.config = config
         with open(PARAMS_FILE_PATH, "r") as f:

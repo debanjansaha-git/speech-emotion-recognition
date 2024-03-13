@@ -15,6 +15,39 @@ from pathlib import Path
 
 
 class ModelEvaluation:
+    """
+    Class for model evaluation.
+
+    Summary:
+        This class handles the evaluation of a trained model using the specified configuration.
+
+    Explanation:
+        The ModelEvaluation class provides methods to evaluate a trained model.
+        The class takes a ModelEvaluationConfig object as input, which contains the necessary configuration parameters for model evaluation.
+        The evaluate_model() method calculates evaluation metrics such as root mean squared error (RMSE), mean absolute error (MAE),
+        and coefficient of determination (R^2) between the true and predicted values.
+        The log_into_mlflow() method logs the evaluation metrics and model parameters into MLflow for tracking and visualization.
+
+    Args:
+        config (ModelEvaluationConfig): The configuration object containing the necessary parameters for model evaluation.
+
+    Methods:
+        evaluate_model(ytrue: np.ndarray, ypred: np.ndarray) -> Tuple[float, float, float, List[float]]:
+            Evaluates the model by calculating RMSE, MAE, R^2, and cross-validated accuracy scores.
+            Returns the evaluation metrics.
+
+        log_into_mlflow():
+            Logs the evaluation metrics and model parameters into MLflow for tracking and visualization.
+
+    Returns:
+        Tuple[float, float, float, List[float]]: The evaluation metrics (RMSE, MAE, R^2, cross-validated accuracy scores).
+
+    Examples:
+        model_evaluation = ModelEvaluation(config)
+        rmse, mae, r2, cv_scores = model_evaluation.evaluate_model(y_true, y_pred)
+        model_evaluation.log_into_mlflow()
+    """
+
     def __init__(self, config: ModelEvaluationConfig):
         self.config = config
 
