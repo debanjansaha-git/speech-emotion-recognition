@@ -6,6 +6,7 @@ from airflow.decorators import task
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.email import EmailOperator
 from airflow import configuration as conf
 from gcp import upload_directory
 
