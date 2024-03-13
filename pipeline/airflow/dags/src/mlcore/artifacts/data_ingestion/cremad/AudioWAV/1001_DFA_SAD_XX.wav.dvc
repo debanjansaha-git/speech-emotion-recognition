@@ -1,0 +1,5 @@
+outs:
+- md5: e23a3444273b62e98d76363f756f104b
+  size: 64108
+  hash: md5
+  path: 1001_DFA_SAD_XX.wav

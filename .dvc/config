@@ -1,0 +1,4 @@
+[core]
+    remote = mlremote
+['remote "mlremote"']
+    url = /tmp/dvcstore

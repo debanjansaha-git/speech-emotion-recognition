@@ -7,13 +7,13 @@ __pycache__/
 *gcs_key.json
 
 # Datasets (huge!)
-pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
-pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/Actor*
+# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
+# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/Actor*
 pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/audio*
-pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/savee/ALL/*
-pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
-*parquet*
-pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/emotion.csv
+# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/savee/ALL/*
+# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
+# *parquet*
+# pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/emotion.csv
 
 # Logs
 *logs/

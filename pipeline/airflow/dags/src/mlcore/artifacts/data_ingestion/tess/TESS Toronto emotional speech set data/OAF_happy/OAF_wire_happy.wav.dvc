@@ -1,0 +1,5 @@
+outs:
+- md5: ff2ed1835a7d72eaad8f36f2d350ec07
+  size: 104532
+  hash: md5
+  path: OAF_wire_happy.wav

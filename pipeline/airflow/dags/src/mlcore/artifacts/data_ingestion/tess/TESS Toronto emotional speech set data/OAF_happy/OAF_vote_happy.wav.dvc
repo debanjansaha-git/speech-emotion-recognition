@@ -1,0 +1,5 @@
+outs:
+- md5: a881726b9296d42e18d976c253e9308f
+  size: 96866
+  hash: md5
+  path: OAF_vote_happy.wav

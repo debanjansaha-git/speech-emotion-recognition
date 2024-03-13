@@ -1,0 +1,5 @@
+outs:
+- md5: 30f3c8492cd2ae1756bfba1de2d16af4
+  size: 96202
+  hash: md5
+  path: OAF_ripe_happy.wav

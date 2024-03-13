@@ -1,0 +1,5 @@
+outs:
+- md5: 4ff5f7e92dfe810c5ed2c9184c454b5c
+  size: 105682
+  hash: md5
+  path: OAF_rat_happy.wav
