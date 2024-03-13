@@ -1,0 +1,5 @@
+outs:
+- md5: 2234528b536a1a51a8e3d26badeb8380
+  size: 89972
+  hash: md5
+  path: OAF_chalk_happy.wav

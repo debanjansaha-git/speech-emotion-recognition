@@ -7,7 +7,8 @@ In today's digital age, understanding human emotions from various sources like a
 
 - [End-to-End MLOps Pipeline for Emotion Detection](#end-to-end-mlops-pipeline-for-emotion-detection)
   - [Table of Contents](#table-of-contents)
-  - [Folder Structure](#folder-structure)
+  - [Folder Structure \& Coding Standards](#folder-structure--coding-standards)
+      - [Read More about our Coding Standards](#read-more-about-our-coding-standards)
   - [Datasets](#datasets)
   - [Key Objectives](#key-objectives)
   - [Data Pipeline](#data-pipeline)
@@ -18,6 +19,7 @@ In today's digital age, understanding human emotions from various sources like a
     - [Data Normalization](#data-normalization)
     - [Data Splitting](#data-splitting)
     - [Data Storage](#data-storage)
+      - [Read more about the Data Pipeline](#read-more-about-the-data-pipeline)
   - [Instructions](#instructions)
     - [Airflow Pipeline](#airflow-pipeline)
     - [MLFlow Pipeline](#mlflow-pipeline)
@@ -30,11 +32,12 @@ In today's digital age, understanding human emotions from various sources like a
   - [Internal Notes by the Team](#internal-notes-by-the-team)
 
 
-## Folder Structure 
+## Folder Structure & Coding Standards
 
 The project files are organised as follows:
 [Organisation](tree.txt)
-  
+
+#### [Read More about our Coding Standards](docs/CodingStandards.md)
 
 ## Datasets
 
@@ -60,6 +63,8 @@ Here are the Data Cards of the datasets:
 
 
 ## Data Pipeline
+
+<img src="assets/data_pipelines/data_pipeline_dag.png" width="1024"/>
 
 ### Data Collection
 - The datasets are downloaded comprising of audio recordings such as speech samples labeled with corresponding emotions (e.g., happiness, sadness, anger).
@@ -94,6 +99,7 @@ We use appropriate signal processing techniques and feature extraction libraries
 - We organize the data into directories or files based on the chosen storage format and directory structure.
 - Finally, the last stage of our data pipeline uploads the data into Google Cloud Storage (GCS) for later retrieval and uses.
 
+#### [Read more about the Data Pipeline](docs/DataPipeline.md)
 
 ## Instructions
 
@@ -187,6 +193,18 @@ python stage_03_data_transformation.py
 
 ## Tools & Technologies
 
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![YAML](https://img.shields.io/badge/yaml-%23ffffff.svg?style=for-the-badge&logo=yaml&logoColor=151515)
+![TF](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white) 
+![Google Cloud](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)
+![Shell Script](https://img.shields.io/badge/shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
+![AirFlow](https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white) 
+![mlflow](https://img.shields.io/badge/mlflow-%23d9ead3.svg?style=for-the-badge&logo=numpy&logoColor=blue)
+![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
+![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+
 **Google Cloud Platform (GCP)**: Compute Engine, Cloud Storage, BigQuery and Vertex AI Platform for scalable infrastructure, data storage, model training, and deployment. The entire project is planned to implemented in **GCP only** with Google Kubernetes Engine (GKE), however, the project is cloud agnostic, so it can be easily integrated into Microsoft Azure, AWS or others providers and platforms like MinIO.
 
 **Airflow**: Orchestration of data preprocessing and transformation, notification pipelines.
@@ -211,7 +229,7 @@ OR
 
 ## Contributions
 
-Create a fork of the repository and submit a pull request after adding your changes
+Create a fork of the repository and submit a pull request after adding your changes subjected to approval by the team.
 
 
 ## Expected Outcomes

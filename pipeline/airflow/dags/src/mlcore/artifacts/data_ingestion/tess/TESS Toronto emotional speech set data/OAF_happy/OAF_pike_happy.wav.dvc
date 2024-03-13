@@ -1,0 +1,5 @@
+outs:
+- md5: 85c1c144d4b1acfee5d20ca6a8251ded
+  size: 100280
+  hash: md5
+  path: OAF_pike_happy.wav

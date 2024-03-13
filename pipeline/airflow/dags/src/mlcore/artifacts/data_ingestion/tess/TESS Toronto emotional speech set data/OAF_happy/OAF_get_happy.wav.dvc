@@ -1,0 +1,5 @@
+outs:
+- md5: 88c16232b8ce2e698608c9f836820b6c
+  size: 92092
+  hash: md5
+  path: OAF_get_happy.wav

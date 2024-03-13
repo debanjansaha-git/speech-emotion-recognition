@@ -1,0 +1,5 @@
+outs:
+- md5: 97f489c78c8499d0cb49374c05f3a8eb
+  size: 92712
+  hash: md5
+  path: OAF_soap_happy.wav

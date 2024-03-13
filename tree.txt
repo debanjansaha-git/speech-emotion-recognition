@@ -1,23 +1,20 @@
 .
-├── Dockerfile              ## For Containerization
 ├── LICENSE                 ## MIT License
 ├── README.md               ## START FROM HERE
-├── docker-compose.yaml     ## For starting containers
+├── assets                  ## assets
 ├── docs                    ## Documentation
-│   ├── CremaDDataCard.md
-│   ├── RavdessDataCard.md
-│   ├── SaveeDataCard.md
-│   └── TessDataCard.md
-├── logs                    ## Older logs
-│   └── running_logs.log
 ├── pipeline
 │   └── airflow             ## Airflow pipeline
+│       ├── Dockerfile                  ## For Containerization
+│       ├── config                      ## Airflow secrets
 │       ├── dags                        ## Main DAGs directory
 │       │   ├── README.md
 │       │   ├── __init__.py
 │       │   ├── build                   ## mlcore package build
 │       │   ├── data_pipeline.py        ## data pipeline dag
 │       │   ├── data_process.py         ## dummy dag
+│       │   ├── dvc.yaml                ## DVC pipeline
+│       │   ├── gcp.py                  ## GCP utility
 │       │   ├── dist                    ## distribution
 │       │   ├── logs                    ## running logs
 │       │   │   └── running_logs.log
@@ -64,19 +61,15 @@
 │       │   │   │       ├── __init__.py
 │       │   │   │       └── common.py               ## common utility functions
 │       │   │   └── mlcore.egg-info                 ## distribution dependencies
-│       │   │       ├── PKG-INFO
-│       │   │       ├── SOURCES.txt
-│       │   │       ├── dependency_links.txt
-│       │   │       └── top_level.txt
 │       │   ├── stage_01_data_ingestion.py          ## ingestion pipeline script
 │       │   ├── stage_02_data_validation.py         ## validation pipeline script
 │       │   ├── stage_03_data_transformation.py     ## transformation pipeline script
 │       │   ├── stage_04_model_trainer.py           ## model training pipeline script
 │       │   ├── stage_05_model_evaluation.py        ## model evaluation pipeline script
 │       │   └── main.py                             ## All-in-one pipeline script
+│       ├── docker-compose.yaml                     ## For starting containers
 │       ├── logs
 │       ├── plugins
-│       ├── requirements.txt
-│       └── secrets
+│       └── requirements.txt
 ├── requirements.txt
 └── tree.txt

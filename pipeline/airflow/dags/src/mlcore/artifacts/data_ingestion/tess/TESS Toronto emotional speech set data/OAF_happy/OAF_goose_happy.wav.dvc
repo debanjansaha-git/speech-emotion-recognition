@@ -1,0 +1,5 @@
+outs:
+- md5: c1583a48a8313ca8f9514038a6143217
+  size: 89182
+  hash: md5
+  path: OAF_goose_happy.wav
