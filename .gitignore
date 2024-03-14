@@ -11,8 +11,8 @@ __pycache__/
 # pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/Actor*
 pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/audio*
 # pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/savee/ALL/*
-# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
-# *parquet*
+pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
+*parquet*
 # pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/emotion.csv
 
 # Logs
