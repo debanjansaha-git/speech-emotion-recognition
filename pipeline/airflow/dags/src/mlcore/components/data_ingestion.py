@@ -33,9 +33,12 @@ class DataIngestion:
     Methods:
         download_data(): Downloads and extracts data from the specified source URL.
 
-    Raises: HTTPError: If there is an error while downloading the data from the source URL. OSError: If there is an error while saving the data to the local data path.
+    Raises: HTTPError: If there is an error while downloading the data from the source URL.
+            OSError: If there is an error while saving the data to the local data path.
 
-    Examples: data_ingestion = DataIngestion(config) data_ingestion.download_data()
+    Examples:
+        data_ingestion = DataIngestion(config)
+        data_ingestion.download_data()
     """
 
     def __init__(self, config: DataIngestionConfig):

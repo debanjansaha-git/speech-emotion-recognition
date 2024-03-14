@@ -152,18 +152,23 @@ class FeatureExtractor:
         return result
 
     def __zcr__(self, data):
+        """Calculates the zero-crossing rate (ZCR) feature from the input data and returns the result."""
         zcr = librosa.feature.zero_crossing_rate(
             data, frame_length=self.frame_length, hop_length=self.hop_length
         )
         return np.squeeze(zcr)
 
     def __rmse__(self, data):
+        """Calculates the root mean square energy (RMSE) feature from the input data and returns the result."""
         rmse = librosa.feature.rms(
             y=data, frame_length=self.frame_length, hop_length=self.hop_length
         )
         return np.squeeze(rmse)
 
     def __mfcc__(self, data, sr, flatten=True):
+        """Calculates the Mel-frequency cepstral coefficients (MFCC) feature from the input data and returns the result.
+        The flatten parameter determines whether to flatten the MFCC array or not. Default is True
+        """
         mfccs = librosa.feature.mfcc(
             y=data,
             sr=sr,
@@ -171,7 +176,7 @@ class FeatureExtractor:
             n_fft=self.frame_length,
             hop_length=self.hop_length,
         )
-        return np.squeeze(mfccs.T) if not flatten else np.ravel(mfccs.T)
+        return np.ravel(mfccs.T) if flatten else np.squeeze(mfccs.T)
 
 
 class DataTransformation:
@@ -423,8 +428,8 @@ class DataTransformation:
         num_cpus = mp.cpu_count() - 1
         logger.info(f"Number of processors: {str(num_cpus)}")
         start = timeit.default_timer()
-        logger.info(f"Multiprocessing started!")
-        # Run the loop in parallel
+        logger.info("Multiprocessing started!")
+        # Run the loop in parallel -> leave atleast 1 CPU core for other processes
         results = Parallel(n_jobs=-2)(
             delayed(self.process_feature)(path, emotion)
             for (path, emotion) in zip(paths, emotions)
