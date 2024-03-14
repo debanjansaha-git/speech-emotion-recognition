@@ -44,7 +44,7 @@ data_validation:
 data_transformation:
   root_dir: src/mlcore/artifacts/data_transformation
   metadata_path: src/mlcore/artifacts/data_validation/metadata.csv
-  output_path: src/mlcore/artifacts/data_transformation/emotions.parquet.gzip
+  output_path: src/mlcore/artifacts/data_transformation
   train_path: src/mlcore/artifacts/data_transformation/train.parquet.gzip
   test_path: src/mlcore/artifacts/data_transformation/test.parquet.gzip
   

@@ -39,18 +39,13 @@ class DataTransformationTrainingPipeline:
                 Path("src/mlcore/artifacts/data_validation/status.txt"), "r"
             ) as f:
                 status = f.read().split(" ")[-1]
-            if status == "True":
-                config_manager = ConfigurationManager()
-                data_transformation_config = (
-                    config_manager.get_data_transformation_config()
-                )
-                data_transformation = DataTransformation(
-                    config=data_transformation_config
-                )
-                data_transformation.feature_engineering()
-                data_transformation.train_test_split_data(test_size=0.2)
-            else:
+            if status != "True":
                 raise Exception("Data schema is not valid")
+            config_manager = ConfigurationManager()
+            data_transformation_config = config_manager.get_data_transformation_config()
+            data_transformation = DataTransformation(config=data_transformation_config)
+            data_transformation.feature_engineering()
+            data_transformation.train_test_split_data(test_size=0.2)
         except Exception as e:
             raise e
 

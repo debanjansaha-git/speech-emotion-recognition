@@ -1,16 +1,25 @@
+import io
 import os
-import numpy as np
-import pandas as pd
+import warnings
 import yaml
 import timeit
+import multiprocessing as mp
+from joblib import Parallel, delayed
+import cProfile
+import pstats
+
+import numpy as np
+import pandas as pd
+import librosa
+from librosa.feature import melspectrogram, mfcc
 from sklearn.model_selection import train_test_split
+
 from mlcore import logger
 from mlcore.constants import *
 from mlcore.entity.config_entity import DataTransformationConfig
-import librosa
-from librosa.feature import melspectrogram, mfcc
-import multiprocessing as mp
-from joblib import Parallel, delayed
+
+warnings.filterwarnings("ignore")
+
 
 # For reproducibility
 np.random.seed(42)
@@ -139,8 +148,9 @@ class FeatureExtractor:
         self.hop_length = hop_length
 
     def extract_features(self, data, sr=22050):
+        """Extracts audio features from the input data and returns the combined feature array."""
         result = np.array([])
-
+        # Extracting features: ZCR, RMSE, and MFCC
         result = np.hstack(
             (
                 result,
@@ -152,18 +162,23 @@ class FeatureExtractor:
         return result
 
     def __zcr__(self, data):
+        """Calculates the zero-crossing rate (ZCR) feature from the input data and returns the result."""
         zcr = librosa.feature.zero_crossing_rate(
             data, frame_length=self.frame_length, hop_length=self.hop_length
         )
         return np.squeeze(zcr)
 
     def __rmse__(self, data):
+        """Calculates the root mean square energy (RMSE) feature from the input data and returns the result."""
         rmse = librosa.feature.rms(
             y=data, frame_length=self.frame_length, hop_length=self.hop_length
         )
         return np.squeeze(rmse)
 
     def __mfcc__(self, data, sr, flatten=True):
+        """Calculates the Mel-frequency cepstral coefficients (MFCC) feature from the input data and returns the result.
+        The flatten parameter determines whether to flatten the MFCC array or not. Default is True.
+        """
         mfccs = librosa.feature.mfcc(
             y=data,
             sr=sr,
@@ -171,7 +186,7 @@ class FeatureExtractor:
             n_fft=self.frame_length,
             hop_length=self.hop_length,
         )
-        return np.squeeze(mfccs.T) if not flatten else np.ravel(mfccs.T)
+        return np.ravel(mfccs.T) if flatten else np.squeeze(mfccs.T)
 
 
 class DataTransformation:
@@ -246,10 +261,12 @@ class DataTransformation:
         """
 
         self.config = config
+        self.chunksize = 1000  # for processing data in chunks
         # Audio Augmentation & Feature Extraction
         self.aug = AudioAugmenter()
         self.feat = FeatureExtractor()
-
+        # read data augmentation params from config file
+        # option to try multiple augmentation params and observe the influence on model performance
         with open(PARAMS_FILE_PATH, "r") as f:
             tfx_params = yaml.safe_load(f)
         self.tfx_params = tfx_params["data_transforms"]["params"]
@@ -278,83 +295,63 @@ class DataTransformation:
             None.
         """
 
-        # Load data
+        # Load raw audio data
         data, sr = librosa.load(path, duration=duration, offset=offset)
-        data_tuple = ()
+        audio_feats = []
+        # perform data augmentation
         for param in self.tfx_params:
             if param == "default":
-                # Extract features from the audio signal
-                og_audio = self.feat.extract_features(data)
-                default_feat = np.array(og_audio)
-                # logger.info("Extracting features from original audio")
-            ### Augmented Features ###
+                audio_feats.append(self.feat.extract_features(data))
             elif param == "noise":
-                # Add AGWN
-                nz_audio = self.aug.noise(data)
-                noise_feat = self.feat.extract_features(nz_audio)
-                # logger.info("Adding AGWN transforms to original audio")
-            elif param == "stretch":
-                # Add time strech
-                str_audio = self.aug.stretch(data)
-                stretch_feat = self.feat.extract_features(str_audio)
-                # logger.info("Adding time stretch transforms to original audio")
+                audio_feats.append(self.feat.extract_features(self.aug.noise(data)))
             elif param == "pitch":
-                # Pitch shift
-                pch_audio = self.aug.pitch(data, sr)
-                pitch_feat = self.feat.extract_features(pch_audio)
-                # logger.info("Adding pitch shift to original audio")
-            ### Polynomial Feature Augmentation ###
+                audio_feats.append(self.feat.extract_features(self.aug.pitch(data, sr)))
             elif param == "pitch_noise":
-                # Add AGWN to pitch shifted audio
-                imd_pch_audio = self.aug.pitch(data, sr)
-                pch_nz_audio = self.aug.noise(imd_pch_audio)
-                pitch_noise_feat = self.feat.extract_features(pch_nz_audio)
-                # logger.info("Adding AGWN to pitch shifted audio")
-            elif param == "stretch_noise":
-                # Add AGWN to pitch shifted audio
-                imd_str_audio = self.aug.stretch(data)
-                str_nz_audio = self.aug.noise(imd_str_audio)
-                stretch_noise_feat = self.feat.extract_features(str_nz_audio)
-                # logger.info("Adding AGWN to time streched audio")
-            elif param == "shift_noise":
-                # Add AGWN to pitch shifted audio
-                imd_sht_audio = self.aug.shift(data)
-                sht_nz_audio = self.aug.noise(imd_sht_audio)
-                shift_noise_feat = self.feat.extract_features(sht_nz_audio)
-                # logger.info("Adding AGWN to shifted audio")
-            elif param == "stretch_shift_noise":
-                imd_str_audio = self.aug.stretch(data)
-                imd_ss_audio = self.aug.shift(imd_str_audio)
-                ss_nz_audio = self.aug.noise(imd_ss_audio)
-                stretch_shift_noise_feat = self.feat.extract_features(ss_nz_audio)
-                # logger.info("Adding AGWN to strech-shifted audio")
-            elif param == "stretch_pitch_noise":
-                imd_pch_audio = self.aug.pitch(data, sr)
-                imd_sp_audio = self.aug.stretch(imd_pch_audio)
-                sp_nz_audio = self.aug.noise(imd_sp_audio)
-                stretch_pitch_noise_feat = self.feat.extract_features(sp_nz_audio)
-                # logger.info("Adding AGWN to strech-pitched audio")
+                pitch_audio = self.aug.pitch(data, sr)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(pitch_audio))
+                )
             elif param == "pitch_shift_noise":
-                imd_pch_audio = self.aug.pitch(data, sr)
-                imd_ps_audio = self.aug.shift(imd_pch_audio)
-                ps_nz_audio = self.aug.noise(imd_ps_audio)
-                pitch_shift_noise_feat = self.feat.extract_features(ps_nz_audio)
-                # logger.info("Adding AGWN to pitch-shifted audio")
+                pitch_audio = self.aug.pitch(data, sr)
+                shift_audio = self.aug.shift(pitch_audio)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(shift_audio))
+                )
             elif param == "pitch_shift_stretch_noise":
-                imd_pch_audio = self.aug.pitch(data, sr)
-                imd_ps_audio = self.aug.shift(imd_pch_audio)
-                imd_pss_audio = self.aug.stretch(imd_ps_audio)
-                ps_nz_audio = self.aug.noise(imd_pss_audio)
-                pitch_shift_stretch_noise_feat = self.feat.extract_features(ps_nz_audio)
-                # logger.info("Adding AGWN to pitch-shift-stretched audio")
+                pitch_audio = self.aug.pitch(data, sr)
+                shift_audio = self.aug.shift(pitch_audio)
+                stretch_audio = self.aug.stretch(shift_audio)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(stretch_audio))
+                )
+            elif param == "shift_noise":
+                shift_audio = self.aug.shift(data)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(shift_audio))
+                )
+            elif param == "stretch":
+                audio_feats.append(self.feat.extract_features(self.aug.stretch(data)))
+            elif param == "stretch_noise":
+                stretch_audio = self.aug.stretch(data)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(stretch_audio))
+                )
+            elif param == "stretch_pitch_noise":
+                pitch_audio = self.aug.pitch(data, sr)
+                stretch_audio = self.aug.stretch(pitch_audio)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(stretch_audio))
+                )
+            elif param == "stretch_shift_noise":
+                stretch_audio = self.aug.stretch(data)
+                shift_audio = self.aug.shift(stretch_audio)
+                audio_feats.append(
+                    self.feat.extract_features(self.aug.noise(shift_audio))
+                )
             else:
                 logger.error("No transformation parameters specified!")
-
-        audio = np.vstack(
-            # tuple([eval(f"{param}_feat") for param in self.tfx_params]),
-            (default_feat, noise_feat, pitch_feat, pitch_noise_feat),
-            casting="same_kind",
-        )
+        # stack and return augmented audio representing real world scenario
+        audio = np.vstack(audio_feats)
         return audio
 
     def process_feature(self, path, emotion):
@@ -413,57 +410,70 @@ class DataTransformation:
 
         root_dir = self.config.root_dir
         metadata_dir = self.config.metadata_path
+        profiler = cProfile.Profile()
+        streams = io.StringIO()
 
         data = pd.read_csv(metadata_dir)
         data = data.dropna()
         paths = data["FilePath"]
         emotions = data["Emotions"]
-        logger.warning(" !!!! OVERHEAT ALERT !!!! ")
+        logger.warning(" !!!! OVERCLOCK ALERT !!!! ")
         logger.warning(" ==== Using Multiprocessors for Data Transformation ====")
-        num_cpus = mp.cpu_count() - 1
+        num_cpus = mp.cpu_count() - 1  # leave atleast 1 CPU core for other tasks
         logger.info(f"Number of processors: {str(num_cpus)}")
         start = timeit.default_timer()
-        logger.info(f"Multiprocessing started!")
-        # Run the loop in parallel
+        logger.info("Multiprocessing started!")
+        # Perform feature extraction in parallel using multiprocessing
+        profiler.enable()  # enable cProfiler for monitoring
         results = Parallel(n_jobs=-2)(
             delayed(self.process_feature)(path, emotion)
             for (path, emotion) in zip(paths, emotions)
         )
-
-        # Collect the results
-        X = []
-        Y = []
-        for result in results:
-            x, y = result
-            X.extend(x)
-            Y.extend(y)
+        profiler.disable()  # terminate profiler
         elapsed_time = timeit.default_timer() - start
         logger.info(f"Elapsed Time: {elapsed_time:.2f} secs")
+        # retrieve top 20 logs in accordance to total time spent descending
+        stats = (
+            pstats.Stats(profiler, stream=streams).sort_stats("tottime").print_stats(20)
+        )
+        logger.info(f"Stats from Multiprocessing:\n{streams.getvalue()}")
 
-        # Saving the unstructured audio signals into a data frame
-        emotions_df = pd.DataFrame(X)
-        emotions_df["Emotions"] = Y
         logger.info("Trying to export dataset to disk....")
         start = timeit.default_timer()
-        # emotions_df.to_csv(os.path.join(root_dir, "emotion.csv"), index=False)
-        emotions_df.to_parquet(self.config.output_path, compression="gzip")
+        # Start processing data in chunks of self.chunksize to reduce IO overheads
+        profiler.enable()
+        for i, chunk_start in enumerate(range(0, len(results), self.chunksize)):
+            logger.info(f"Processing Chunk {i} now...")
+            chunk_end = min(chunk_start + self.chunksize, len(results))
+            results_chunk = results[chunk_start:chunk_end]
+
+            X_chunk = []
+            Y_chunk = []
+            # Unravel features (ndarrays) before creating dataframe
+            for result in results_chunk:
+                x, y = result
+                X_chunk.extend(x)
+                Y_chunk.extend(y)
+
+            emotions_df = pd.DataFrame(X_chunk)
+            emotions_df.fillna(
+                0, inplace=True
+            )  # fill missing value w/ 0 - short duration audio
+            emotions_df["Emotions"] = Y_chunk  # Extract labels
+
+            # Converted unstructured data -> structured data & storing as parquet for later use
+            emotions_df.to_parquet(
+                f"{self.config.output_path}/data_part_{i}.parquet", compression="gzip"
+            )
+        profiler.disable()
+        stats = (
+            pstats.Stats(profiler, stream=streams).sort_stats("tottime").print_stats(20)
+        )
+        logger.info(f"Stats from WriteParquet:\n{streams.getvalue()}")
+
         logger.info("Dataframe written to disk!!")
         elapsed_time = timeit.default_timer() - start
         logger.info(f"Elapsed Time: {elapsed_time:.2f} secs")
-        emotions_df = pd.read_parquet(self.config.output_path)
-        logger.info(f"Shape of saved Dataframe {str(emotions_df.shape)}")
-        logger.info(
-            f"Data Types: \n {str(emotions_df.info())}",
-        )
-        logger.info(f"Descriptive Stats: \n{str(emotions_df.describe(include='all'))}")
-        logger.info(
-            f"Total Null Values Before Zero Imputation: {str(emotions_df.isna().sum().sum())}"
-        )
-        # Since the audio signals are of different length fill missing with 0
-        emotions_df = emotions_df.fillna(0)
-        logger.info(
-            f"Total Null Values After Zero Imputation: {str(emotions_df.isna().sum().sum())}"
-        )
 
     def train_test_split_data(self, test_size=0.2):
         """
@@ -484,10 +494,23 @@ class DataTransformation:
             None.
 
         Raises:
-            None.
+            FileNotFoundError: if either the output_path does not exists or there is no parquet file.
         """
+        output_path = self.config.output_path
+        if not os.path.isdir(output_path):
+            raise FileNotFoundError(f"Output directory {output_path} does not exist!")
 
-        emotions_df = pd.read_parquet(self.config.output_path)
+        data_files = os.listdir(output_path)
+        data_paths = [
+            os.path.join(output_path, filename)
+            for filename in data_files
+            if filename.startswith("data_part_") and filename.endswith(".parquet")
+        ]
+        if not data_paths:
+            raise FileNotFoundError("No data files found matching the pattern!")
+
+        all_data = [pd.read_parquet(path) for path in data_paths]
+        emotions_df = pd.concat(all_data, ignore_index=True)
         train, test = train_test_split(
             emotions_df, test_size=test_size, random_state=42
         )
