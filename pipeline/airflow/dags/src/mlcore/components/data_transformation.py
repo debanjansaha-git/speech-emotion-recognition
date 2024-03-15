@@ -300,6 +300,10 @@ class DataTransformation:
 
         self.config = config
         self.chunksize = 1000  # for processing data in chunks
+        self.X_mean = None
+        self.X_std = None
+        self.X_min = None
+        self.X_max = None
         # Audio Augmentation & Feature Extraction
         self.aug = AudioAugmenter()
         self.feat = FeatureExtractor()
@@ -455,15 +459,15 @@ class DataTransformation:
         data = data.dropna()
         paths = data["FilePath"]
         emotions = data["Emotions"]
-        logger.warning(" !!!! OVERCLOCK ALERT !!!! ")
+        logger.warning(" !!!! OVERCLOCKING ALERT !!!! ")
         logger.warning(" ==== Using Multiprocessors for Data Transformation ====")
         num_cpus = mp.cpu_count() - 1  # leave atleast 1 CPU core for other tasks
-        logger.info(f"Number of processors: {str(num_cpus)}")
+        logger.info(f"Number of processors used: {str(num_cpus)}")
         start = timeit.default_timer()
         logger.info("Multiprocessing started!")
         # Perform feature extraction in parallel using multiprocessing
         profiler.enable()  # enable cProfiler for monitoring
-        results = Parallel(n_jobs=-2)(
+        results = Parallel(n_jobs=num_cpus)(
             delayed(self.process_feature)(path, emotion)
             for (path, emotion) in zip(paths, emotions)
         )
@@ -540,7 +544,7 @@ class DataTransformation:
         else:
             raise FileNotFoundError("No data files found matching the pattern!")
 
-    def train_test_split_data(self, test_size=0.2, val_size=0.5):
+    def train_test_split_data(self, test_size=0.2, val_size=0.2):
         """
         Splits the data into train, validation, and test sets.
 
@@ -555,61 +559,68 @@ class DataTransformation:
         all_data = [pd.read_parquet(path) for path in data_paths]
         emotions_df = pd.concat(all_data, ignore_index=True)
 
+        # Split into train and test sets
         train, test = train_test_split(
             emotions_df, test_size=test_size, random_state=42
         )
-        test, val = train_test_split(test, test_size=val_size, random_state=42)
+        # Split train into train and validation
+        train, val = train_test_split(train, test_size=val_size, random_state=42)
         logger.info(
             f"Shapes ==> Train: {train.shape}, Val: {val.shape}, Test: {test.shape}"
         )
         return train, val, test
 
-    def split_and_scale(self, test_size, val_size, method="train"):
+    def split_and_scale(self, test_size, val_size, method="standard"):
         """
         Splits the data into train, validation, and test sets, and scales the features.
 
         Args:
-            method (str, optional): The method to use for splitting and scaling. Defaults to "train".
+            method (str, optional): The method to use for splitting and scaling. Defaults to "standard".
             test_size (float, optional): The proportion of the data to use for the test set. Defaults to 0.2.
-            val_size (float, optional): The proportion of the data to use for the validation set. Defaults to 0.5.
+            val_size (float, optional): The proportion of the data to use for the validation set. Defaults to 0.2.
 
         Raises:
-            RuntimeError: If `split_and_scale` is called with `method='test'` before calling it with `method='train'`.
+            None.
 
         Examples:
-            # Example 1: Split and scale the data for training
-            split_and_scale(method="train", test_size=0.2, val_size=0.5)
+            # Example 1: Split and scale the data using Z-Score normalization
+            split_and_scale(test_size=0.2, val_size=0.2, method="standard")
 
-            # Example 2: Scale the test data using the previously computed mean and standard deviation
-            split_and_scale(method="test")
+            # Example 2: Split and scale the data using min-max normalization
+            split_and_scale(test_size=0.2, val_size=0.2, method="min-max")
         """
 
-        if method == "train":
-            train_data, val_data, test_data = self.train_test_split_data(
-                test_size=test_size, val_size=val_size
-            )
-            X_train = train_data.drop("Emotions", axis=1)
-            X_val = val_data.drop("Emotions", axis=1)
-            y_train = train_data["Emotions"]
-            y_val = val_data["Emotions"]
+        train_data, val_data, test_data = self.train_test_split_data(
+            test_size=test_size, val_size=val_size
+        )
+        X_train = train_data.drop("Emotions", axis=1)
+        X_val = val_data.drop("Emotions", axis=1)
+        X_test = test_data.drop("Emotions", axis=1)
+        y_train = train_data["Emotions"]
+        y_val = val_data["Emotions"]
+        y_test = test_data["Emotions"]
+        if method == "standard":
             self.X_mean = np.mean(X_train, axis=0)
             self.X_std = np.std(X_train, axis=0)
+            # Perform Z-Score Normalization (StandardScaler) by Training mean & std
             X_train = (X_train - self.X_mean) / self.X_std
             X_val = (X_val - self.X_mean) / self.X_std
-            X_train["Emotions"] = y_train
-            X_val["Emotions"] = y_val
-            X_train.to_parquet(self.config.train_path, compression="gzip")
-            X_val.to_parquet(self.config.val_path, compression="gzip")
-
-        elif method == "test":
-            if not hasattr(self, "X_mean") or not hasattr(self, "X_std"):
-                logger.error("Call the split_and_scale(method='train') first!!!")
-                raise RuntimeError("Call the split_and_scale(method='train') first!!!")
-            else:
-                X_test = test_data.drop("Emotions", axis=1)
-                y_test = test_data["Emotions"]
-                X_test = (X_test - self.X_mean) / self.X_std
-                X_test["Emotions"] = y_test
-                X_test.to_parquet(self.config.test_path, compression="gzip")
-
-        logger.info("Dataframe written to disk!!")
+            X_test = (X_test - self.X_mean) / self.X_std
+        elif method == "min-max":
+            self.X_min = np.min(X_train, axis=0)
+            self.X_max = np.max(X_train, axis=0)
+            # Perform Min-Max Normalization by Training min & max
+            X_train = (X_train - self.X_min) / (self.X_max - self.X_min)
+            X_val = (X_val - self.X_min) / (self.X_max - self.X_min)
+            X_test = (X_test - self.X_min) / (self.X_max - self.X_min)
+        else:
+            logger.error("Unsupported or no scaling method provided!")
+        X_train["Emotions"] = y_train
+        X_val["Emotions"] = y_val
+        X_test["Emotions"] = y_test
+        X_train.to_parquet(self.config.train_path, compression="gzip")
+        logger.info("Train data written to disk!!")
+        X_val.to_parquet(self.config.val_path, compression="gzip")
+        logger.info("Validation data written to disk!!")
+        X_test.to_parquet(self.config.test_path, compression="gzip")
+        logger.info("Test data written to disk!!")

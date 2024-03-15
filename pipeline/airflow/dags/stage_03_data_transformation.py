@@ -46,7 +46,7 @@ class DataTransformationTrainingPipeline:
             data_transformation = DataTransformation(config=data_transformation_config)
             data_transformation.feature_engineering()
             data_transformation.split_and_scale(
-                method="train", test_size=0.3, val_size=0.5
+                test_size=0.2, val_size=0.2, method="standard"
             )
         except Exception as e:
             raise e
