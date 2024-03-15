@@ -11,7 +11,6 @@ import pstats
 import numpy as np
 import pandas as pd
 import librosa
-from librosa.feature import melspectrogram, mfcc
 from sklearn.model_selection import train_test_split
 
 from mlcore import logger
@@ -20,9 +19,13 @@ from mlcore.entity.config_entity import DataTransformationConfig
 
 warnings.filterwarnings("ignore")
 
+np.random.seed(42)  # For reproducibility
 
-# For reproducibility
-np.random.seed(42)
+##  ===> Sorcery by Deb Begins! <====
+## To understand this code, a broad background of Audio Digital Signal Processing (DSP) is required.
+## If you are unfamiliar with audio signal processing, please refer to the following website before proceeding:
+## https://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
+## NOTE: This code will use the multiprocessing library (All your CPU cores but one).
 
 
 class AudioAugmenter:
@@ -190,7 +193,8 @@ class FeatureExtractor:
         return np.squeeze(rmse)
 
     def __chroma__(self, data, sr):
-        """Calculates chromagram or power spectrogram from the input data and returns the result."""
+        """Calculates chromagram or power spectrogram from the frequency data and returns the result."""
+        # convert to time-frequency domain by Discrete Fourier Transform
         stft = np.abs(librosa.stft(data))
         chroma_stft = np.mean(
             librosa.feature.chroma_stft(S=stft, sr=sr, hop_length=self.hop_length).T,
@@ -419,7 +423,7 @@ class DataTransformation:
             Y.append(emotion)
         return X, Y
 
-    def feature_engineering(self):
+    def feature_engineering(self):  # sourcery skip: extract-duplicate-method
         """
         Function for feature engineering.
 
