@@ -93,6 +93,7 @@ class DataTransformationConfig:
     metadata_path: Path
     output_path: Path
     train_path: Path
+    val_path: Path
     test_path: Path
 
 

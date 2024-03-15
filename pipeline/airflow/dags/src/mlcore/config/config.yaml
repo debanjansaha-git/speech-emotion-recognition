@@ -45,8 +45,9 @@ data_transformation:
   root_dir: src/mlcore/artifacts/data_transformation
   metadata_path: src/mlcore/artifacts/data_validation/metadata.csv
   output_path: src/mlcore/artifacts/data_transformation
-  train_path: src/mlcore/artifacts/data_transformation/train.parquet.gzip
-  test_path: src/mlcore/artifacts/data_transformation/test.parquet.gzip
+  train_path: src/mlcore/artifacts/data_transformation/train_data.parquet
+  val_path: src/mlcore/artifacts/data_transformation/val_data.parquet
+  test_path: src/mlcore/artifacts/data_transformation/test_data.parquet
   
 ### ================================================================
 ###                 MODEL TRAIN CONFIGURATION

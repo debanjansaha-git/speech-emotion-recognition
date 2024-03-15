@@ -180,6 +180,7 @@ class ConfigurationManager:
             metadata_path=config.metadata_path,
             output_path=config.output_path,
             train_path=config.train_path,
+            val_path=config.val_path,
             test_path=config.test_path,
         )
 

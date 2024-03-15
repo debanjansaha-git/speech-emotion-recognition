@@ -45,7 +45,9 @@ class DataTransformationTrainingPipeline:
             data_transformation_config = config_manager.get_data_transformation_config()
             data_transformation = DataTransformation(config=data_transformation_config)
             data_transformation.feature_engineering()
-            data_transformation.train_test_split_data(test_size=0.2)
+            data_transformation.split_and_scale(
+                method="train", test_size=0.3, val_size=0.5
+            )
         except Exception as e:
             raise e
 
