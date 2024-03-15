@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 import optuna
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import cross_val_score
 import keras
@@ -86,10 +85,21 @@ class ModelTrainer:
         self.model_params = model_params["model_params"]["CNN"]
         self.encoder = OneHotEncoder()
 
-    def hp_tune_cnn(self, trial, X_train, y_train_enc, X_val, y_val_enc):
+    def hp_tune_cnn(self, trial, X_train, y_train_enc):
+        """
+        Performs hyperparameter tuning for the CNN model using Optuna.
+
+        Args:
+            trial (optuna.Trial): The Optuna trial object.
+            X_train (numpy.ndarray): The training data.
+            y_train_enc (numpy.ndarray): The encoded training labels.
+
+        Returns:
+            float: The mean accuracy score obtained during hyperparameter tuning.
+        """
         # Define the hyperparameters to be tuned
         n_filters = trial.suggest_int("n_filters", 64, 256, log=True)
-        kernel_size = trial.suggest_int("kernel_size", 3, 7)
+        kernel_size = trial.suggest_int("kernel_size", 3, 10)
         pool_size = trial.suggest_int("pool_size", 2, 5)
         dropout_rate = trial.suggest_uniform("dropout_rate", 0.1, 0.5)
 
@@ -100,19 +110,27 @@ class ModelTrainer:
         model.compile(
             optimizer="Adam", loss="categorical_crossentropy", metrics=["accuracy"]
         )
-        history = model.fit(
-            X_train,
-            y_train_enc,
-            batch_size=64,
-            epochs=2,
-            validation_data=(X_val, y_val_enc),
-            verbose=0,
-        )
+        # Train the model with cross-validation
+        accuracy_scores = []
+        for _ in range(3):  # Perform 3-fold cross-validation
+            model.fit(X_train, y_train_enc, epochs=2, batch_size=64, verbose=0)
+            _, accuracy = model.evaluate(X_train, y_train_enc, verbose=0)
+            accuracy_scores.append(accuracy)
 
-        # Return the validation accuracy
-        return history.history["val_accuracy"][-1]
+        # Compute the mean accuracy score
+        accuracy = np.mean(accuracy_scores)
+        return accuracy
 
     def prep_data_for_training(self):
+        """
+        Prepares the data for model training by performing necessary preprocessing steps.
+
+        Returns:
+            tuple: A tuple containing the preprocessed training and validation data.
+
+        Examples:
+            X_train, y_train_enc, X_val, y_val_enc = prep_data_for_training()
+        """
         train_data = pd.read_parquet(self.config.train_path)
         val_data = pd.read_parquet(self.config.val_path)
         X_train = train_data.drop("Emotions", axis=1)
@@ -129,7 +147,16 @@ class ModelTrainer:
         return X_train, y_train_enc, X_val, y_val_enc
 
     def train(self, hypertune=False):
+        """
+        Trains the model using the prepared training and validation data.
 
+        Args:
+            hypertune (bool, optional): Whether to perform hyperparameter tuning using Optuna. Defaults to False.
+
+        Examples:
+            # Example 1: Train the model without hyperparameter tuning: train()
+            # Example 2: Train the model with hyperparameter tuning:    train(hypertune=True)
+        """
         best_params = self.model_params
         X_train, y_train_enc, X_val, y_val_enc = self.prep_data_for_training()
         logger.info("Archiving train-val datasets to disk...")
@@ -145,9 +172,7 @@ class ModelTrainer:
             study = optuna.create_study(direction="maximize")
             # study.optimize(self.hp_tune, (n_trials=25, x_train, y_train))
             study.optimize(
-                lambda trial: self.hp_tune_cnn(
-                    trial, X_train, y_train_enc, X_val, y_val_enc
-                ),
+                lambda trial: self.hp_tune_cnn(trial, X_train, y_train_enc),
                 n_trials=5,
             )
             best_params = study.best_params
@@ -165,6 +190,9 @@ class ModelTrainer:
 
         # Create a CNN model
         model = self.cnn_model_1(X_train.shape[1], **self.model_params)
+        model.compile(
+            optimizer="Adam", loss="categorical_crossentropy", metrics=["accuracy"]
+        )
         model.summary(print_fn=logger.info)
         logger.info("Begin Model Training")
         start = timeit.default_timer()
@@ -189,6 +217,24 @@ class ModelTrainer:
     def cnn_model_1(
         self, inp_shape, n_filters, kernel_size, pool_size, dropout_rate, **kwargs
     ):
+        """
+        Creates a CNN model for speech emotion recognition.
+
+        Args:
+            inp_shape (int):        The input shape of the model.
+            n_filters (int):        The number of filters in the convolutional layers.
+            kernel_size (int):      The size of the convolutional kernel.
+            pool_size (int):        The size of the max pooling window.
+            dropout_rate (float):   The dropout rate for regularization.
+            **kwargs:               Additional keyword arguments.
+
+        Returns:
+            tensorflow.keras.models.Sequential: The created CNN model.
+
+        Examples:
+            # Example 1: Create a CNN model
+            model = cnn_model_1(inp_shape=100, n_filters=32, kernel_size=3, pool_size=2, dropout_rate=0.2)
+        """
         model = Sequential()
         model.add(
             Conv1D(

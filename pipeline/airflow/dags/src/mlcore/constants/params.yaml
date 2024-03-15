@@ -5,5 +5,7 @@ data_transforms:
 ### Model Parameters
 model_params:
   CNN:
-    max_depth: 6
-    n_estimators: 48
+    n_filters: 128
+    kernel_size: 5
+    pool_size: 8
+    dropout_rate: 0.5
