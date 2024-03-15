@@ -3,7 +3,7 @@ data_transforms:
   params: ['default', 'noise', 'pitch', 'pitch_noise']
 
 ### Model Parameters
-model_parans:
-  RandomForestClassifier:
+model_params:
+  CNN:
     max_depth: 6
     n_estimators: 48

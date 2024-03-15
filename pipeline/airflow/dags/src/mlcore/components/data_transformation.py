@@ -561,10 +561,15 @@ class DataTransformation:
 
         # Split into train and test sets
         train, test = train_test_split(
-            emotions_df, test_size=test_size, random_state=42
+            emotions_df,
+            test_size=test_size,
+            stratify=emotions_df["Emotions"],
+            random_state=42,
         )
         # Split train into train and validation
-        train, val = train_test_split(train, test_size=val_size, random_state=42)
+        train, val = train_test_split(
+            train, test_size=val_size, stratify=train["Emotions"], random_state=42
+        )
         logger.info(
             f"Shapes ==> Train: {train.shape}, Val: {val.shape}, Test: {test.shape}"
         )

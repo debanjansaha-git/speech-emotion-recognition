@@ -14,6 +14,8 @@ pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/audio*
 pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
 *parquet*
 # pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/emotion.csv
+*npy
+*joblib
 
 # Logs
 *logs/
