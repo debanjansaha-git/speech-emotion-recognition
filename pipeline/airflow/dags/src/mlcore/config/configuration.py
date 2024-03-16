@@ -180,6 +180,7 @@ class ConfigurationManager:
             metadata_path=config.metadata_path,
             output_path=config.output_path,
             train_path=config.train_path,
+            val_path=config.val_path,
             test_path=config.test_path,
         )
 
@@ -205,17 +206,17 @@ class ConfigurationManager:
 
         config = self.config.model_trainer
         params = self.params.model_params
-        schema = self.schema.TARGET_COLUMN
+        label = self.schema.TARGET_COLUMN
 
         create_directories([config.root_dir])
 
         model_trainer_config = ModelTrainerConfig(
             root_dir=config.root_dir,
-            train_data_path=config.train_data_path,
-            test_data_path=config.test_data_path,
+            train_path=config.train_path,
+            val_path=config.val_path,
             model_name=config.model_name,
-            model_params=params,
-            target_col=schema.name,
+            params=params,
+            target_col=label,
         )
 
         return model_trainer_config
@@ -239,19 +240,20 @@ class ConfigurationManager:
         """
 
         config = self.config.model_evaluation
-        schema = self.schema.TARGET_COLUMN
+        target = self.schema.TARGET_COLUMN
         params = self.params.model_parans
 
         create_directories([config.root_dir])
 
         model_evaluation_config = ModelEvaluationConfig(
             root_dir=config.root_dir,
-            train_data_path=config.train_data_path,
-            test_data_path=config.test_data_path,
+            train_path=config.train_path,
+            val_path=config.val_path,
+            test_path=config.test_path,
             model_path=config.model_path,
             model_params=params,
             metric_file_name=config.metric_file_name,
-            target_col=schema.name,
+            target_col=target,
             mlflow_uri=config.mlflow_uri,
         )
 

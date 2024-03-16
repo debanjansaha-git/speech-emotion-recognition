@@ -11,7 +11,6 @@ import pstats
 import numpy as np
 import pandas as pd
 import librosa
-from librosa.feature import melspectrogram, mfcc
 from sklearn.model_selection import train_test_split
 
 from mlcore import logger
@@ -20,9 +19,13 @@ from mlcore.entity.config_entity import DataTransformationConfig
 
 warnings.filterwarnings("ignore")
 
+np.random.seed(42)  # For reproducibility
 
-# For reproducibility
-np.random.seed(42)
+##  ===> Sorcery by Deb Begins! <====
+## To understand this code, a broad background of Audio Digital Signal Processing (DSP) is required.
+## If you are unfamiliar with audio signal processing, please refer to the following website before proceeding:
+## https://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
+## NOTE: This code will use the multiprocessing library (All your CPU cores but one).
 
 
 class AudioAugmenter:
@@ -113,7 +116,7 @@ class FeatureExtractor:
 
     Explanation:
         The FeatureExtractor class contains methods to extract features such as zero-crossing rate (ZCR), root mean square energy (RMSE),
-        and Mel-frequency cepstral coefficients (MFCC) from audio data. The extract_features() method combines these features into a single array
+        Mel-frequency cepstral coefficients (MFCC), chromagram, Mel Spectrogram from audio data. The extract_features() method combines these features into a single array
         and returns the result. The class takes optional parameters for frame length and hop length, which control the size and overlap of the analysis windows.
 
     Methods:
@@ -126,6 +129,12 @@ class FeatureExtractor:
 
         __rmse__(data: np.ndarray) -> np.ndarray:
             Calculates the root mean square energy (RMSE) feature from the input data and returns the result.
+
+        __chroma__(data: np.ndarray, sr: int) -> np.ndarray:
+            Calculates chromagram or power spectrogram from the input data and returns the result.
+
+        __melspec__(data: np.ndarray, sr: int) -> np.ndarray:
+            Calculates Mel Spectrogram from the input data and returns the result.
 
         __mfcc__(data: np.ndarray, sr: int, flatten: bool = True) -> np.ndarray:
             Calculates the Mel-frequency cepstral coefficients (MFCC) feature from the input data and returns the result.
@@ -156,6 +165,8 @@ class FeatureExtractor:
                 result,
                 self.__zcr__(data),
                 self.__rmse__(data),
+                self.__chroma__(data, sr),
+                self.__melspec__(data, sr),
                 self.__mfcc__(data, sr),
             )
         )
@@ -163,30 +174,57 @@ class FeatureExtractor:
 
     def __zcr__(self, data):
         """Calculates the zero-crossing rate (ZCR) feature from the input data and returns the result."""
-        zcr = librosa.feature.zero_crossing_rate(
-            data, frame_length=self.frame_length, hop_length=self.hop_length
+        zcr = np.mean(
+            librosa.feature.zero_crossing_rate(
+                data, frame_length=self.frame_length, hop_length=self.hop_length
+            ).T,
+            axis=0,
         )
         return np.squeeze(zcr)
 
     def __rmse__(self, data):
         """Calculates the root mean square energy (RMSE) feature from the input data and returns the result."""
-        rmse = librosa.feature.rms(
-            y=data, frame_length=self.frame_length, hop_length=self.hop_length
+        rmse = np.mean(
+            librosa.feature.rms(
+                y=data, frame_length=self.frame_length, hop_length=self.hop_length
+            ).T,
+            axis=0,
         )
         return np.squeeze(rmse)
+
+    def __chroma__(self, data, sr):
+        """Calculates chromagram or power spectrogram from the frequency data and returns the result."""
+        # convert to time-frequency domain by Discrete Fourier Transform
+        stft = np.abs(librosa.stft(data))
+        chroma_stft = np.mean(
+            librosa.feature.chroma_stft(S=stft, sr=sr, hop_length=self.hop_length).T,
+            axis=0,
+        )
+        return np.squeeze(chroma_stft)
+
+    def __melspec__(self, data, sr):
+        """Calculates Mel Spectrogram from the input data and returns the result."""
+        spectro = np.mean(
+            librosa.feature.melspectrogram(y=data, sr=sr, hop_length=self.hop_length).T,
+            axis=0,
+        )
+        return np.squeeze(spectro)
 
     def __mfcc__(self, data, sr, flatten=True):
         """Calculates the Mel-frequency cepstral coefficients (MFCC) feature from the input data and returns the result.
         The flatten parameter determines whether to flatten the MFCC array or not. Default is True.
         """
-        mfccs = librosa.feature.mfcc(
-            y=data,
-            sr=sr,
-            n_mfcc=20,
-            n_fft=self.frame_length,
-            hop_length=self.hop_length,
+        mfccs = np.mean(
+            librosa.feature.mfcc(
+                y=data,
+                sr=sr,
+                n_mfcc=128,
+                n_fft=self.frame_length,
+                hop_length=self.hop_length,
+            ).T,
+            axis=0,
         )
-        return np.ravel(mfccs.T) if flatten else np.squeeze(mfccs.T)
+        return np.ravel(mfccs) if flatten else np.squeeze(mfccs)
 
 
 class DataTransformation:
@@ -262,6 +300,10 @@ class DataTransformation:
 
         self.config = config
         self.chunksize = 1000  # for processing data in chunks
+        self.X_mean = None
+        self.X_std = None
+        self.X_min = None
+        self.X_max = None
         # Audio Augmentation & Feature Extraction
         self.aug = AudioAugmenter()
         self.feat = FeatureExtractor()
@@ -385,7 +427,7 @@ class DataTransformation:
             Y.append(emotion)
         return X, Y
 
-    def feature_engineering(self):
+    def feature_engineering(self):  # sourcery skip: extract-duplicate-method
         """
         Function for feature engineering.
 
@@ -417,15 +459,15 @@ class DataTransformation:
         data = data.dropna()
         paths = data["FilePath"]
         emotions = data["Emotions"]
-        logger.warning(" !!!! OVERCLOCK ALERT !!!! ")
+        logger.warning(" !!!! OVERCLOCKING ALERT !!!! ")
         logger.warning(" ==== Using Multiprocessors for Data Transformation ====")
         num_cpus = mp.cpu_count() - 1  # leave atleast 1 CPU core for other tasks
-        logger.info(f"Number of processors: {str(num_cpus)}")
+        logger.info(f"Number of processors used: {str(num_cpus)}")
         start = timeit.default_timer()
         logger.info("Multiprocessing started!")
         # Perform feature extraction in parallel using multiprocessing
         profiler.enable()  # enable cProfiler for monitoring
-        results = Parallel(n_jobs=-2)(
+        results = Parallel(n_jobs=num_cpus)(
             delayed(self.process_feature)(path, emotion)
             for (path, emotion) in zip(paths, emotions)
         )
@@ -475,48 +517,115 @@ class DataTransformation:
         elapsed_time = timeit.default_timer() - start
         logger.info(f"Elapsed Time: {elapsed_time:.2f} secs")
 
-    def train_test_split_data(self, test_size=0.2):
+    def get_data_paths(self, output_path):
         """
-        Function for splitting data into train and test sets.
-
-        Summary:
-            This function splits the data into train and test sets.
-
-        Explanation:
-            The train_test_split_data() function takes the output path and test size as input.
-            It reads the data from the output path, splits it into train and test sets using the specified test size,
-            and saves the train and test sets to disk.
+        Checks if the output directory exists and returns a list of data file paths matching the pattern.
 
         Args:
-            test_size (float): The proportion of the data to include in the test set (default: 0.2).
+            output_path (str): The path to the directory containing data files.
 
         Returns:
-            None.
+            list: A list of data file paths.
 
         Raises:
-            FileNotFoundError: if either the output_path does not exists or there is no parquet file.
+            FileNotFoundError: If the output directory does not exist or no data files are found.
         """
-        output_path = self.config.output_path
         if not os.path.isdir(output_path):
             raise FileNotFoundError(f"Output directory {output_path} does not exist!")
 
         data_files = os.listdir(output_path)
-        data_paths = [
+        if data_paths := [
             os.path.join(output_path, filename)
             for filename in data_files
             if filename.startswith("data_part_") and filename.endswith(".parquet")
-        ]
-        if not data_paths:
+        ]:
+            return data_paths
+
+        else:
             raise FileNotFoundError("No data files found matching the pattern!")
 
+    def train_test_split_data(self, test_size=0.2, val_size=0.2):
+        """
+        Splits the data into train, validation, and test sets.
+
+        Args:
+            test_size (float, optional): The proportion of the data to use for the test set. Defaults to 0.2.
+            val_size (float, optional): The proportion of the data to use for the validation set. Defaults to 0.5.
+
+        Returns:
+            tuple: A tuple containing the train, validation, and test dataframes.
+        """
+        data_paths = self.get_data_paths(self.config.output_path)
         all_data = [pd.read_parquet(path) for path in data_paths]
         emotions_df = pd.concat(all_data, ignore_index=True)
+
+        # Split into train and test sets
         train, test = train_test_split(
-            emotions_df, test_size=test_size, random_state=42
+            emotions_df,
+            test_size=test_size,
+            stratify=emotions_df["Emotions"],
+            random_state=42,
         )
-        logger.info("Data split into train and test")
-        logger.info(f"Train data shape: {str(train.shape)}")
-        logger.info(f"Test data shape: {str(test.shape)}")
-        train.to_parquet(self.config.train_path, compression="gzip")
-        test.to_parquet(self.config.test_path, compression="gzip")
-        logger.info("Dataframe written to disk!!")
+        # Split train into train and validation
+        train, val = train_test_split(
+            train, test_size=val_size, stratify=train["Emotions"], random_state=42
+        )
+        logger.info(
+            f"Shapes ==> Train: {train.shape}, Val: {val.shape}, Test: {test.shape}"
+        )
+        return train, val, test
+
+    def split_and_scale(self, test_size, val_size, method="standard"):
+        """
+        Splits the data into train, validation, and test sets, and scales the features.
+
+        Args:
+            method (str, optional): The method to use for splitting and scaling. Defaults to "standard".
+            test_size (float, optional): The proportion of the data to use for the test set. Defaults to 0.2.
+            val_size (float, optional): The proportion of the data to use for the validation set. Defaults to 0.2.
+
+        Raises:
+            None.
+
+        Examples:
+            # Example 1: Split and scale the data using Z-Score normalization
+            split_and_scale(test_size=0.2, val_size=0.2, method="standard")
+
+            # Example 2: Split and scale the data using min-max normalization
+            split_and_scale(test_size=0.2, val_size=0.2, method="min-max")
+        """
+
+        train_data, val_data, test_data = self.train_test_split_data(
+            test_size=test_size, val_size=val_size
+        )
+        X_train = train_data.drop("Emotions", axis=1)
+        X_val = val_data.drop("Emotions", axis=1)
+        X_test = test_data.drop("Emotions", axis=1)
+        y_train = train_data["Emotions"]
+        y_val = val_data["Emotions"]
+        y_test = test_data["Emotions"]
+        if method == "standard":
+            self.X_mean = np.mean(X_train, axis=0)
+            self.X_std = np.std(X_train, axis=0)
+            # Perform Z-Score Normalization (StandardScaler) by Training mean & std
+            X_train = (X_train - self.X_mean) / self.X_std
+            X_val = (X_val - self.X_mean) / self.X_std
+            X_test = (X_test - self.X_mean) / self.X_std
+        elif method == "min-max":
+            self.X_min = np.min(X_train, axis=0)
+            self.X_max = np.max(X_train, axis=0)
+            # Perform Min-Max Normalization by Training min & max
+            X_train = (X_train - self.X_min) / (self.X_max - self.X_min)
+            X_val = (X_val - self.X_min) / (self.X_max - self.X_min)
+            X_test = (X_test - self.X_min) / (self.X_max - self.X_min)
+        else:
+            logger.error("Unsupported or no scaling method provided!")
+        X_train["Emotions"] = y_train
+        X_val["Emotions"] = y_val
+        X_test["Emotions"] = y_test
+        X_train.to_parquet(self.config.train_path, compression="gzip")
+        logger.info("Train data written to disk!!")
+        X_val.to_parquet(self.config.val_path, compression="gzip")
+        logger.info("Validation data written to disk!!")
+        X_test.to_parquet(self.config.test_path, compression="gzip")
+        logger.info("Test data written to disk!!")

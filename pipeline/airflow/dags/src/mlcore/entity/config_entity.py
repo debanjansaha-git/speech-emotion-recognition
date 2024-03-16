@@ -93,6 +93,7 @@ class DataTransformationConfig:
     metadata_path: Path
     output_path: Path
     train_path: Path
+    val_path: Path
     test_path: Path
 
 
@@ -121,10 +122,10 @@ class ModelTrainerConfig:
     """
 
     root_dir: Path
-    train_data_path: Path
-    test_data_path: Path
+    train_path: Path
+    val_path: Path
     model_name: str
-    model_params: dict
+    params: dict
     target_col: str
 
 
@@ -156,8 +157,9 @@ class ModelEvaluationConfig:
     """
 
     root_dir: Path
-    train_data_path: Path
-    test_data_path: Path
+    train_path: Path
+    val_path: Path
+    test_path: Path
     model_path: Path
     model_params: dict
     metric_file_name: str

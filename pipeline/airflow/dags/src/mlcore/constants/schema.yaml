@@ -6,4 +6,4 @@ COLUMNS:
   Dataset: string
 
 TARGET_COLUMN: 
-  Emotion: int
+  Emotions: string
