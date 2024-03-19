@@ -38,7 +38,8 @@ class DataIngestionTrainingPipeline:
             data_ingestion_config_list = config_manager.get_data_ingestion_config()
             for data_ingestion_config in data_ingestion_config_list:
                 data_ingestion = DataIngestion(config=data_ingestion_config)
-                data_ingestion.download_data()
+                # data_ingestion.download_data()
+                data_ingestion.download_from_gcp()
         except Exception as e:
             raise e
 

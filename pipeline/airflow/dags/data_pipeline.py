@@ -16,7 +16,7 @@ from stage_03_data_transformation import DataTransformationTrainingPipeline
 
 
 # Enable pickle support for XCom, allowing data to be passed between tasks
-conf.set("core", "enable_xcom_pickling", "True")
+# conf.set("core", "enable_xcom_pickling", "True")
 
 # Start Dag Definition
 default_args = {
@@ -72,7 +72,7 @@ send_email = EmailOperator(
 )
 
 
-start_pipeline = BashOperator(task_id="start_pipeline", bash_command="pwd && ls -lart")
+# start_pipeline = BashOperator(task_id="start_pipeline", bash_command="pwd && ls -lart")
 
 data_ingestion = PythonOperator(
     task_id="data_ingestion",
@@ -81,12 +81,12 @@ data_ingestion = PythonOperator(
     dag=dag,
 )
 
-upload_data_ingestion = PythonOperator(
-    task_id="upload_data_ingestion", 
-    python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts', '', "/opt/airflow/config/gcs_key.json", 4] ,
-    dag=dag
-)
+# upload_data_ingestion = PythonOperator(
+#     task_id="upload_data_ingestion", 
+#     python_callable=upload_directory,
+#     op_args = ['artifacts-speech-emotion', '/opt/airflow/dags/src/mlcore/artifacts', '', "/opt/airflow/config/gcs_key.json", 4] ,
+#     dag=dag
+# )
 
 data_validation = PythonOperator(
     task_id="data_validation",
@@ -98,7 +98,7 @@ data_validation = PythonOperator(
 upload_data_validation = PythonOperator(
     task_id="upload_data_validation", 
     python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts/data_validation', 'data_validation/', "/opt/airflow/config/gcs_key.json", 4] ,
+    op_args = ['artifacts-speech-emotion', '/opt/airflow/dags/src/mlcore/artifacts/data_validation', 'data_validation/', "/opt/airflow/config/gcs_key.json", 4] ,
     dag=dag
 )
 
@@ -113,20 +113,19 @@ data_transformation = PythonOperator(
 upload_data_transformation = PythonOperator(
     task_id="upload_data_transformation", 
     python_callable=upload_directory,
-    op_args = ['mlops-grp3-data-bucket', '/opt/airflow/dags/src/mlcore/artifacts/data_transformation', 'data_transformation/', "/opt/airflow/config/gcs_key.json", 4] ,
+    op_args = ['artifacts-speech-emotion', '/opt/airflow/dags/src/mlcore/artifacts/data_transformation', 'data_transformation/', "/opt/airflow/config/gcs_key.json", 4] ,
     dag=dag
 )
 
-end_pipeline = EmptyOperator(
-    task_id="end_pipeline",
-    dag=dag,
-)
+# end_pipeline = EmptyOperator(
+#     task_id="end_pipeline",
+#     dag=dag,
+# )
 
 with dag:
     # Set dependencies between tasks
-    start_pipeline >> data_ingestion
-    data_ingestion >> [data_validation, upload_data_ingestion]
+    data_ingestion >> data_validation
     data_validation >> [data_transformation, upload_data_validation]
     data_transformation >> upload_data_transformation
-    upload_data_transformation >> end_pipeline >> send_email
+    upload_data_transformation >> send_email
     

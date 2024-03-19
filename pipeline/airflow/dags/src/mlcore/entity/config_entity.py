@@ -26,6 +26,8 @@ class DataIngestionConfig:
     root_dir: Path
     source_URL: str
     local_data_path: Path
+    gcp_bucket_name: str
+    gcp_data_path: Path
 
 
 @dataclass(frozen=True)

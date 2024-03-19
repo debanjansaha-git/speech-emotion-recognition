@@ -4,7 +4,9 @@ import urllib.request as request
 from urllib.request import urlopen
 from urllib.parse import unquote, urlparse
 from urllib.error import HTTPError
+from google.cloud import storage
 import zipfile
+from collections import defaultdict 
 from mlcore import logger
 from mlcore.utils.common import get_size
 from pathlib import Path
@@ -107,3 +109,49 @@ class DataIngestion:
             logger.info(
                 f"Data already exists in location {self.config.local_data_path}, skipping download!"
             )
+
+    def download_from_gcp(self, threads=8):
+        """Downloads data from a public google cloud bucket. Uses input and 
+        output paths from a config file with the help of the config attribute.
+
+        Args:
+            threads (int, optional): Number of thread to use for parallel downloads. Defaults to 8.
+        """
+        
+        # Using an anonymous client since we use a public bucket
+        client = storage.Client.create_anonymous_client()
+        # Setting our local output directory to store the files
+        # TODO: Use the artifacts root instead of 'data_ingestion/' dir
+        output_dir = Path(self.config.root_dir.replace('data_ingestion', ''))
+        bucket = client.bucket(bucket_name=self.config.gcp_bucket_name)
+        # List all files present on the bucket
+        file_paths = [blob.name for blob in bucket.list_blobs(prefix=str(self.config.gcp_data_path))]
+        
+        result_dict = defaultdict(lambda: 0)
+        files_to_download = []
+        for file_path in file_paths:
+            p = Path(file_path)
+            if os.path.exists(os.path.join(output_dir, p)):
+                result_dict['skipped'] += 1
+            else:
+                files_to_download.append(file_path)
+        result_dict['files_to_download'] = len(files_to_download)
+        
+        logger.info(f'Starting Download for {len(files_to_download)} files')
+        # Download the files using multiple threads
+        results = storage.transfer_manager.download_many_to_path(
+            bucket, files_to_download, 
+            destination_directory=output_dir, 
+            worker_type=storage.transfer_manager.THREAD, 
+            max_workers=threads
+        )
+
+        # Observe the result status for all the files
+        for name, result in zip(files_to_download, results):
+        # The results list is either `None` or an exception for each blob in
+        # the input list, in order.
+            if isinstance(result, Exception):
+                result_dict['failed'] += 1
+            else:
+                result_dict['downloaded'] += 1
+        logger.info(f'Download complete. Results: {result_dict.items()}')
