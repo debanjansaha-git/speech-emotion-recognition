@@ -113,6 +113,8 @@ class ConfigurationManager:
                 root_dir=config.root_dir,
                 source_URL=config.source_URL,
                 local_data_path=config.local_data_path,
+                gcp_bucket_name=config.gcp_bucket_name,
+                gcp_data_path=config.gcp_data_path
             )
             data_ingestion_config_list.append(data_ingestion_config)
         return data_ingestion_config_list
