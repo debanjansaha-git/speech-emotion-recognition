@@ -7,6 +7,7 @@ In today's digital age, understanding human emotions from various sources like a
 
 - [End-to-End MLOps Pipeline for Emotion Detection](#end-to-end-mlops-pipeline-for-emotion-detection)
   - [Table of Contents](#table-of-contents)
+  - [Steps to run this pipeline](#steps-to-run-this-pipeline)
   - [Folder Structure \& Coding Standards](#folder-structure--coding-standards)
       - [Read More about our Coding Standards](#read-more-about-our-coding-standards)
   - [Datasets](#datasets)
@@ -31,6 +32,29 @@ In today's digital age, understanding human emotions from various sources like a
   - [License](#license)
   - [Internal Notes by the Team](#internal-notes-by-the-team)
 
+
+## Steps to run this pipeline
+### Airflow Service
+Our pipeline runs using Airflow and Docker Container. 
+As a prerequisite, you should have Docker running on your system.
+
+Move to the **pipeline/airflow** directory
+With the airflow directory as your working directory, run the following command to start airflow in docker:
+```bash
+docker compose up
+```
+
+If you make any changes to the code, you have to re-build the container. For this, you want to stop the container and start it again, with a re-build.
+
+To remove current containers:
+```bash
+docker compose down
+```
+
+To build and start the container:
+```bash
+docker compose up --build
+```
 
 ## Folder Structure & Coding Standards
 
@@ -114,7 +138,7 @@ The entire application is orchestrated by Airflow so running the Docker containe
 - With the **airflow** directory as your working directory, run the following command to start airflow in docker one after the other:
 
 ```bash
-docker compose up airflow-init
+docker compose up --build
 ```
 This command initializes the database and services needed to start and run the airflow webserver, scheduler, etc.
 
