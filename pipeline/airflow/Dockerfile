@@ -11,4 +11,5 @@ RUN pip install -U pip --upgrade pip
 RUN pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION:-2.8.1}" -r /opt/airflow/requirements.txt
 
 COPY --chown=0 --chmod=777 ./dags /opt/airflow/dags
+EXPOSE 8080
 RUN pip install .
