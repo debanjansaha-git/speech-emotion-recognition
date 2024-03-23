@@ -8,6 +8,9 @@ In today's digital age, understanding human emotions from various sources like a
 - [End-to-End MLOps Pipeline for Emotion Detection](#end-to-end-mlops-pipeline-for-emotion-detection)
   - [Table of Contents](#table-of-contents)
   - [Steps to run this pipeline](#steps-to-run-this-pipeline)
+    - [Airflow Service](#airflow-service)
+      - [Run Airflow in GCP](#run-airflow-in-gcp)
+      - [Run Airflow in your Local System](#run-airflow-in-your-local-system)
   - [Folder Structure \& Coding Standards](#folder-structure--coding-standards)
       - [Read More about our Coding Standards](#read-more-about-our-coding-standards)
   - [Datasets](#datasets)
@@ -38,20 +41,33 @@ In today's digital age, understanding human emotions from various sources like a
 Our pipeline runs using Airflow and Docker Container. 
 As a prerequisite, you should have Docker running on your system.
 
-Move to the **pipeline/airflow** directory
-With the airflow directory as your working directory, run the following command to start airflow in docker:
+#### Run Airflow in GCP
+
+Please follow the detailed instructions present in the following file for setting up Airflow and running it in GCP.
+
+[Airflow in GCP](docs/SetupAirflowGCP.md)
+
+#### Run Airflow in your Local System
+
+- Clone the GitHub repository
+```bash
+git clone https://github.com/debanjansaha-git/speech-emotion-recognition.git
+```
+- This will clone the github repository in the folder called "speech-emotion-recognition" and `cd speech-emotion-recognition`
+- Move to the **pipeline/airflow** directory
+- With the airflow directory as your working directory, run the following command to start airflow in docker:
 ```bash
 docker compose up
 ```
 
-If you make any changes to the code, you have to re-build the container. For this, you want to stop the container and start it again, with a re-build.
+- If you make any changes to the code, you have to re-build the container. For this, you want to stop the container and start it again, with a re-build.
 
-To remove current containers:
+- To remove current containers:
 ```bash
 docker compose down
 ```
 
-To build and start the container:
+- To build and start the container:
 ```bash
 docker compose up --build
 ```
