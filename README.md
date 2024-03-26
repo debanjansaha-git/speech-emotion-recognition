@@ -9,7 +9,8 @@ In today's digital age, understanding human emotions from various sources like a
   - [Table of Contents](#table-of-contents)
   - [Steps to run this pipeline](#steps-to-run-this-pipeline)
     - [Airflow Service](#airflow-service)
-      - [Run Airflow in GCP](#run-airflow-in-gcp)
+      - [Using Terraform for IaaC deployments in GCP](#using-terraform-for-iaac-deployments-in-gcp)
+      - [Run Airflow using GCP Management Console](#run-airflow-using-gcp-management-console)
       - [Run Airflow in your Local System](#run-airflow-in-your-local-system)
   - [Folder Structure \& Coding Standards](#folder-structure--coding-standards)
       - [Read More about our Coding Standards](#read-more-about-our-coding-standards)
@@ -39,11 +40,49 @@ In today's digital age, understanding human emotions from various sources like a
 ## Steps to run this pipeline
 ### Airflow Service
 Our pipeline runs using Airflow and Docker Container. 
-As a prerequisite, you should have Docker running on your system.
+As a prerequisite, you should have Docker running on your system, or you can also run Docker on cloud VMs.
 
-#### Run Airflow in GCP
+#### Using Terraform for IaaC deployments in GCP
 
-Please follow the detailed instructions present in the following file for setting up Airflow and running it in GCP.
+We want to use Terraform for IaaC (Infrastructure-as-a-Code) for allocating our resources and destroying them when we are done with it.
+
+If you do not have Terraform installed in your system, please follow the guide mentioned [Here](docs/TerraformGuide.md)
+
+Once Terraform has been installed, in order to allocate resources on GCP, use the commands below:
+
+- Navigate to the directory pipeline/terraform
+
+- Execute the commands:
+- To initialize terraform
+```bash
+terraform init
+```
+- To create a terraform execution plan to allocate resources and save it to a file
+```bash
+terraform plan -out tf.plan
+```
+- Convert the execution plan to a human-readable format
+```bash
+terraform show  tf.plan > tfplan.ansi
+```
+- View the terraform plan
+```bash
+less -R tfplan.ansi
+```
+- Execute the terraform plan created in the earlier steps
+```bash
+terraform apply "tf.plan"
+```
+
+- Once you are satisfied with your work, or your work has completed, make sure to delete all the resources allocated by:
+```bash
+terraform destroy
+```
+
+#### Run Airflow using GCP Management Console
+
+The above mentioned steps can also be performed from the Google Cloud management console using GUI.
+Please follow the detailed instructions present in the following file for setting up Airflow using the managemenet console and running it in GCP.
 
 [Airflow in GCP](docs/SetupAirflowGCP.md)
 
