@@ -207,26 +207,20 @@ To open the Airflow UI, open the following link in your browser:
 
 ### MLFlow Pipeline
 
-- Move to the **$HOME** directory
-- Create your virtual environment and install all the dependencies
-
-```python
-pip install -r ./src/mlflow/requirements.txt
-```
-
-- Start MLFlow Web UI:
+- Move to the **pipeline/mlflow** directory
+- With the **mlflow** directory as your working directory, run the following command to start mlflow in docker one after the other:
 
 ```bash
-mlflow ui --port=5001
+docker compose up --build
 ```
-This will fire up the MLFlow UI, and open the following link in your browser:
-[http://0.0.0.0:5001](http://0.0.0.0:5001)
+This command initializes the database and services needed to start and run the mlflow tracker.
 
-- In order to log experiments using MLFlow execute the Trainer module from the **$HOME** directory:
-
-```python
-python ./src/mlflow/mlflow_trainer.py
+```bash
+docker compose up
 ```
+To open the MLflow UI, open the following link in your browser:
+[http://0.0.0.0:5001/](http://0.0.0.0:5001/)
+
 
 ### Core ML Module
 
@@ -328,10 +322,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 
 ## Internal Notes by the Team
-
-**1. How to contribute to the the pipeline (How to develop your own dags)**
-
-The dags, logs, plugins and secrets folders are copied into the container and are updated in real-time. Any changes you make to the files inside these folders will reflect inside the container.
-
-
 
