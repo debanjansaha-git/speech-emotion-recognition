@@ -1,6 +1,18 @@
 artifacts_root: src/mlcore/artifacts
 
 ### ================================================================
+###                 DATA GEN CONFIGURATION
+### ================================================================
+data_generation:
+  gcp_metadata_bucket: metadata_store_bucket
+  gcp_train_bucket: train-bucket-model
+  gcp_test_bucket: test-bucket-model
+  metadata_dir: src/mlcore/artifacts/metadata
+  train_dir: src/mlcore/artifacts/data_ingestion/train_data
+  test_dir: src/mlcore/artifacts/data_ingestion/test_data
+
+
+### ================================================================
 ###                 INGESTION CONFIGURATION
 ### ================================================================
 

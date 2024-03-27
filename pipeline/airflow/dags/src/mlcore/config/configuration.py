@@ -2,6 +2,7 @@ from mlcore.constants import *
 from mlcore.utils.common import read_yaml, create_directories
 import os
 from mlcore.entity.config_entity import (
+    DataGenerationConfig,
     DataIngestionConfig,
     DataValidationConfig,
     DataTransformationConfig,
@@ -81,6 +82,26 @@ class ConfigurationManager:
         self.schema = read_yaml(schema_filepath)
 
         create_directories([self.config.artifacts_root])
+    
+    def get_data_generation_config(self) -> DataGenerationConfig:
+        
+        config = self.config.data_generation
+        config_list = [
+            config.metadata_dir,
+            config.train_dir,
+            config.test_dir,
+        ]
+        create_directories(config_list)
+        
+        data_generation_config = DataGenerationConfig(
+            gcp_metadata_bucket = config.gcp_metadata_bucket,
+            gcp_train_bucket = config.gcp_train_bucket,
+            gcp_test_bucket = config.gcp_test_bucket,
+            metadata_dir = config.metadata_dir,
+            train_dir = config.train_dir,
+            test_dir = config.test_dir,
+            )
+        return data_generation_config
 
     def get_data_ingestion_config(self) -> list:
         """
