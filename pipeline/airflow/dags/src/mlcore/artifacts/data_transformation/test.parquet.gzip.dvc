@@ -1,5 +1,0 @@
-outs:
-- md5: f72e34c3428d036a6ad6a524fc665c43
-  size: 136811858
-  hash: md5
-  path: test.parquet.gzip
