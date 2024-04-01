@@ -1,0 +1,19 @@
+FROM continuumio/miniconda3:latest
+
+WORKDIR /app
+
+# Update pip
+RUN pip install -U pip
+
+# Install FastAPI dependencies
+COPY ./pipeline/fastapi/requirements.txt ./fastapi-requirements.txt
+RUN pip install -r fastapi-requirements.txt
+
+# Copy the FastAPI application
+COPY ./pipeline/fastapi .
+
+# Expose port for FastAPI
+EXPOSE 8000
+
+# Run Uvicorn with FastAPI app
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
