@@ -271,6 +271,11 @@ services:
       - mlflow-db-volume:/var/lib/mysql
     networks:
       - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mlflow:
     image: ubuntu/mlflow:2.1.1_1.0-22.04
@@ -287,6 +292,12 @@ services:
     depends_on:
       wait-for-db:
         condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5000/", " || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   wait-for-db:
     image: atkrad/wait4x
