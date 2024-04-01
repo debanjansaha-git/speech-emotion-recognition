@@ -279,7 +279,7 @@ services:
     ports:
       - "5001:5000"
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=pipeline/airflow/config/gcp_key_deb.json
+      - GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDS_PATH}
     networks:
       - public
       - internal
@@ -304,7 +304,7 @@ services:
     depends_on:
       - "mlflow"
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=pipeline/airflow/config/gcp_key_deb.json
+      - GOOGLE_APPLICATION_CREDENTIALS=${GCP_CREDS_PATH}
       - MLFLOW_TRACKING_URI=http://mlflow:5000
     entrypoint: >
       /bin/sh -c "
