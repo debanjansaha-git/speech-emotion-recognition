@@ -4,8 +4,8 @@ WORKDIR /app
 
 RUN pip install -U pip --upgrade pip
 
-COPY ./requirements.txt .
+COPY ./pipeline/mlflow/requirements.txt ./requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY ./pipeline/mlflow .
