@@ -20,6 +20,8 @@ from keras.layers import (
 )
 from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, Callback
+import mlflow
+from mlflow.tracking import MlflowClient
 
 from mlcore.constants import *
 from mlcore import logger
@@ -51,13 +53,13 @@ class ModelTrainer:
     Class for model training.
 
     Summary:
-        This class handles the training of a Random Forest model using the specified configuration.
+        This class handles the training of a CNN model using the specified configuration.
 
     Explanation:
-        The ModelTrainer class provides methods to train a Random Forest model.
+        The ModelTrainer class provides methods to train a CNN model.
         The class takes a ModelTrainerConfig object as input, which contains the necessary configuration parameters for model training.
         The hp_tune() method performs hyperparameter tuning using Optuna to find the best set of hyperparameters for the model.
-        The train() method trains the Random Forest model using the specified hyperparameters and saves the trained model to disk.
+        The train() method trains the CNN model using the specified hyperparameters and saves the trained model to disk.
 
     Args:
         config (ModelTrainerConfig): The configuration object containing the necessary parameters for model training.
@@ -67,7 +69,7 @@ class ModelTrainer:
             Performs hyperparameter tuning using Optuna and returns the accuracy score.
 
         train(hypertune: bool = True):
-            Trains the Random Forest model using the specified hyperparameters and saves the trained model to disk.
+            Trains the CNN model using the specified hyperparameters and saves the trained model to disk.
 
     Raises:
         No transformation parameters specified: If no transformation parameters are specified in the configuration.
@@ -157,62 +159,71 @@ class ModelTrainer:
             # Example 1: Train the model without hyperparameter tuning: train()
             # Example 2: Train the model with hyperparameter tuning:    train(hypertune=True)
         """
-        best_params = self.model_params
-        X_train, y_train_enc, X_val, y_val_enc = self.prep_data_for_training()
-        logger.info("Archiving train-val datasets to disk...")
-        np.save(f"{self.config.root_dir}/X_train.npy", X_train)
-        np.save(f"{self.config.root_dir}/X_val.npy", X_val)
-        np.save(f"{self.config.root_dir}/y_train.npy", y_train_enc)
-        np.save(f"{self.config.root_dir}/y_val.npy", y_val_enc)
-        logger.info(f"Train Data: {X_train.shape}, Train Targets: {y_train_enc.shape}")
-
-        # Hyper Parameter Tuning
-        if hypertune:
-            logger.info("=== Hyperparameter Tuning using Optuna ===")
-            study = optuna.create_study(direction="maximize")
-            # study.optimize(self.hp_tune, (n_trials=25, x_train, y_train))
-            study.optimize(
-                lambda trial: self.hp_tune_cnn(trial, X_train, y_train_enc),
-                n_trials=5,
+        mlflow.set_experiment("SER_v1")
+        with mlflow.start_run():
+            best_params = self.model_params
+            X_train, y_train_enc, X_val, y_val_enc = self.prep_data_for_training()
+            logger.info("Archiving train-val datasets to disk...")
+            np.save(f"{self.config.root_dir}/X_train.npy", X_train)
+            np.save(f"{self.config.root_dir}/X_val.npy", X_val)
+            np.save(f"{self.config.root_dir}/y_train.npy", y_train_enc)
+            np.save(f"{self.config.root_dir}/y_val.npy", y_val_enc)
+            logger.info(
+                f"Train Data: {X_train.shape}, Train Targets: {y_train_enc.shape}"
             )
-            best_params = study.best_params
-            logger.info(f"Best Parameters Found: {best_params}")
 
-            # Update best hyperparameters
-            self.model_params = best_params
-            # # Write new hyperparameters
-            # if self.model_params != best_params:
-            #     with open(PARAMS_FILE_PATH, "r") as f:
-            #         tuned_params = yaml.safe_load(f)
-            #     tuned_params["model_params"]["CNN_1"] = best_params
-            #     with open(PARAMS_FILE_PATH, "w") as f:
-            #         yaml.dump(tuned_params, f, default_flow_style=False)
+            # Hyper Parameter Tuning
+            if hypertune:
+                logger.info("=== Hyperparameter Tuning using Optuna ===")
+                study = optuna.create_study(direction="maximize")
+                # study.optimize(self.hp_tune, (n_trials=25, x_train, y_train))
+                study.optimize(
+                    lambda trial: self.hp_tune_cnn(trial, X_train, y_train_enc),
+                    n_trials=5,
+                )
+                best_params = study.best_params
+                logger.info(f"Best Parameters Found: {best_params}")
 
-        # Create a CNN model
-        model = self.cnn_model_1(X_train.shape[1], **self.model_params)
-        model.compile(
-            optimizer="Adam", loss="categorical_crossentropy", metrics=["accuracy"]
-        )
-        model.summary(print_fn=logger.info)
-        logger.info("Begin Model Training")
-        start = timeit.default_timer()
-        rlrp = ReduceLROnPlateau(
-            monitor="val_loss", factor=0.4, verbose=0, patience=2, min_lr=0.0000001
-        )
-        history = model.fit(
-            X_train,
-            y_train_enc,
-            batch_size=64,
-            epochs=2,
-            validation_data=(X_val, y_val_enc),
-            callbacks=[rlrp, LoggingCallback(logger.info)],
-        )
-        elapsed_time = timeit.default_timer() - start
-        logger.info(f"Training Duration: {elapsed_time:.2f} secs")
+                # Update best hyperparameters
+                self.model_params = best_params
+                # # Write new hyperparameters
+                if self.model_params != best_params:
+                    with open(PARAMS_FILE_PATH, "r") as f:
+                        tuned_params = yaml.safe_load(f)
+                    tuned_params["model_params"]["CNN"] = best_params
+                    with open(PARAMS_FILE_PATH, "w") as f:
+                        yaml.dump(tuned_params, f, default_flow_style=False)
 
-        # Save model
-        logger.info("Export Trained Model for future inference")
-        joblib.dump(model, os.path.join(self.config.root_dir, self.config.model_name))
+            # Create a CNN model
+            model = self.cnn_model_1(X_train.shape[1], **self.model_params)
+            model.compile(
+                optimizer="Adam", loss="categorical_crossentropy", metrics=["accuracy"]
+            )
+            model.summary(print_fn=logger.info)
+            logger.info("Begin Model Training")
+            start = timeit.default_timer()
+            rlrp = ReduceLROnPlateau(
+                monitor="val_loss", factor=0.4, verbose=0, patience=2, min_lr=0.0000001
+            )
+            history = model.fit(
+                X_train,
+                y_train_enc,
+                batch_size=64,
+                epochs=2,
+                validation_data=(X_val, y_val_enc),
+                callbacks=[rlrp, LoggingCallback(logger.info)],
+            )
+            elapsed_time = timeit.default_timer() - start
+            logger.info(f"Training Duration: {elapsed_time:.2f} secs")
+            # Logging the model
+            mlflow.keras.log_model(model, "model")
+            mlflow.log_params(self.model_params)
+
+            # Save model
+            logger.info("Export Trained Model for future inference")
+            joblib.dump(
+                model, os.path.join(self.config.root_dir, self.config.model_name)
+            )
 
     def cnn_model_1(
         self, inp_shape, n_filters, kernel_size, pool_size, dropout_rate, **kwargs

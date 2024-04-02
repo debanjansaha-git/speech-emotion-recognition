@@ -16,4 +16,5 @@ soundfile
 optuna
 google-cloud-storage
 dvc
+psutil
 # -e .

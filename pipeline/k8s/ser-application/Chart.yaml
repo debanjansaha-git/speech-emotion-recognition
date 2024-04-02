@@ -1,0 +1,19 @@
+apiVersion: v2
+name: ser-application
+description: A Helm chart for deploying the SER application on Kubernetes
+version: 0.1.0
+appVersion: "1.0"
+
+keywords:
+  - ser
+  - speech-emotion-recognition
+  - airflow
+  - mlflow
+  - fastapi
+home: https://debanjansaha.com/ser-application
+sources:
+  - https://github.com/debanjansaha-git/speech-emotion-recognition
+maintainers:
+  - name: Debanjan Saha
+    email: saha.deb@northeastern.edu
+    url: https://debanjansaha.com
