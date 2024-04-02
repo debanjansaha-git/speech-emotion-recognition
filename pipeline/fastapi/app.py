@@ -43,22 +43,27 @@ async def get_run(run_id: str):
 @app.post("/train")
 async def train_model(train_request: TrainRequest):
     try:
+        experiment_id = "0"
         async with httpx.AsyncClient() as client:
             # Start an MLflow run
+            create_run_payload = {
+                "experiment_id": experiment_id,
+            }
             create_response = await client.post(
-                f"{mlflow_uri}/api/2.0/mlflow/runs/create", json={}
+                f"{mlflow_uri}/api/2.0/mlflow/runs/create", json=create_run_payload
             )
             create_response.raise_for_status()
             run_id = create_response.json()["run"]["info"]["run_id"]
 
             # Log a parameter from the request
+            log_param_payload = {
+                "run_id": run_id,
+                "key": train_request.param_key,
+                "value": train_request.param_value,
+            }
             log_response = await client.post(
                 f"{mlflow_uri}/api/2.0/mlflow/runs/log-parameter",
-                json={
-                    "run_id": run_id,
-                    "key": train_request.param_key,
-                    "value": train_request.param_value,
-                },
+                json=log_param_payload,
             )
             log_response.raise_for_status()
 
