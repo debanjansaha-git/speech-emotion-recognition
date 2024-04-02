@@ -51,6 +51,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ./artifacts:/opt/airflow/artifacts
   user: "${AIRFLOW_UID:-0}:0"
   depends_on:
     &airflow-common-depends-on
@@ -292,6 +293,8 @@ services:
     depends_on:
       wait-for-db:
         condition: service_completed_successfully
+    volumes:
+      - ./artifacts:/app/artifacts
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:5000/", " || exit 1"]
       interval: 30s
@@ -337,6 +340,8 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
     networks:
       - internal
+    volumes:
+      - ./artifacts:/app/artifacts
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 30s
