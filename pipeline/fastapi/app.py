@@ -6,6 +6,17 @@ app = FastAPI()
 mlflow_uri = "http://mlflow:5000"
 
 
+### ===========================
+###       DEFINE THE ROUTES
+### ===========================
+@app.get("/test-connection")
+async def test_connection():
+    async with httpx.AsyncClient() as client:
+        # Attempt to fetch MLFlow's health or main page just to test connectivity
+        response = await client.get(mlflow_uri)
+    return {"mlflow_response": response.text}
+
+
 @app.get("/train")
 async def train_model():
     async with httpx.AsyncClient() as client:
