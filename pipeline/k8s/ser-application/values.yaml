@@ -1,0 +1,49 @@
+postgres:
+  image: "postgres:13"
+  user: "airflow"
+  password: "airflow"
+  db: "airflow"
+  service:
+    port: 5432
+
+redis:
+  image: "redis:latest"
+  service:
+    port: 6379
+
+airflow:
+  image:
+    repository: "apache/airflow"
+    tag: "2.2.3"
+  executor: "CeleryExecutor"
+  fernetKey: ""
+  secretKey: "abcdefghij"
+  configs:
+    postgresUser: "airflow"
+    postgresPassword: "airflow"
+    postgresDb: "airflow"
+  scheduler:
+    replicas: 1
+  worker:
+    replicas: 2
+  webserver:
+    service:
+      type: LoadBalancer
+      port: 8080
+
+mlflow:
+  image: "ubuntu/mlflow:2.1.1_1.0-22.04"
+  backendUri: "mysql+pymysql://mlflow:mlflow@mlflow-db:3306/mlflow"
+  defaultArtifactRoot: "gs://my-bucket/mlflow"
+  gcpCredsPath: "/var/secrets/google/key.json"
+  service:
+    type: LoadBalancer
+    port: 5000
+
+# Define PVCs if necessary, for example, for Airflow DAGs, logs, and MLflow's artifact storage.
+persistence:
+  enabled: true
+  storageClass: "standard" # This is GKE's default storage class, change as needed.
+  size: 10Gi
+
+# Add any other necessary components or configurations based on your deployment requirements.

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-worker
+spec:
+  replicas: {{ .Values.airflow.worker.replicas }}
+  selector:
+    matchLabels:
+      app: airflow-worker
+  template:
+    metadata:
+      labels:
+        app: airflow-worker
+    spec:
+      containers:
+      - name: airflow-worker
+        image: "{{ .Values.airflow.image }}"
+        env:
+          {{- include "airflow.commonEnvVars" . | nindent 10 }}
+        volumeMounts:
+          {{- include "airflow.commonVolumeMounts" . | nindent 10 }}
+        

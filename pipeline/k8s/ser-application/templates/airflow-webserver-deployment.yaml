@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-webserver
+  template:
+    metadata:
+      labels:
+        app: airflow-webserver
+    spec:
+      containers:
+        - name: airflow-webserver
+          image: "{{ .Values.airflow.image }}"
+          env:
+            {{- include "airflow.commonEnvVars" . | nindent 10 }}
+          volumeMounts:
+            {{- include "airflow.commonVolumeMounts" . | nindent 10 }}
+          ports:
+            - containerPort: 8080

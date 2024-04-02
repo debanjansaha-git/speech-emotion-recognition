@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+    spec:
+      containers:
+      - name: mlflow
+        image: "{{ .Values.mlflow.image }}"
+        env:
+          {{- include "airflow.commonEnvVars" . | nindent 10 }}
+        volumeMounts:
+          {{- include "airflow.commonVolumeMounts" . | nindent 10 }}
+        ports:
+        - containerPort: 5000

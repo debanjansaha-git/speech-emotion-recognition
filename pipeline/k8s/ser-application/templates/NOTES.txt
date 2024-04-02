@@ -1,0 +1,2 @@
+This project will be deployed on Kubernetes (GKE) using Helm Charts.
+Here are the various configurations related to it.
