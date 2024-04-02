@@ -40,7 +40,7 @@ async def get_run(run_id: str):
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@app.post("/train")  # Note the change to a POST method to accept a body.
+@app.post("/train")
 async def train_model(train_request: TrainRequest):
     try:
         async with httpx.AsyncClient() as client:
