@@ -1,13 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import httpx
+from stage_04_model_trainer import ModelTrainerTrainingPipeline
 
 app = FastAPI()
 
 mlflow_uri = "http://mlflow:5000"
 
 
-class TrainRequest(BaseModel):
+class ParamLogger(BaseModel):
     param_key: str
     param_value: str
 
@@ -40,8 +41,8 @@ async def get_run(run_id: str):
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@app.post("/train")
-async def train_model(train_request: TrainRequest):
+@app.post("/log-param")
+async def log_param(train_request: ParamLogger):
     try:
         experiment_id = "0"
         async with httpx.AsyncClient() as client:
@@ -74,6 +75,13 @@ async def train_model(train_request: TrainRequest):
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/train")
+def predict(hypertune: str):
+    obj = ModelTrainerTrainingPipeline()
+    obj.main(hypertune=hypertune)
+    return {"message": "Model has been trained successfully"}
 
 
 @app.get("/predict")

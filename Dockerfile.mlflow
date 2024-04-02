@@ -11,3 +11,8 @@ RUN pip install -r mlflow-requirements.txt
 
 # Copy over the MLflow project
 COPY ./pipeline/mlflow .
+
+USER root
+COPY --chown=0 --chmod=777 ./setup.py ./README.md ./
+COPY --chown=0 --chmod=777 ./src ./src
+RUN python ./setup.py install
