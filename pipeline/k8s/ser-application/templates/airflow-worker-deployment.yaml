@@ -14,9 +14,22 @@ spec:
     spec:
       containers:
       - name: airflow-worker
-        image: "{{ .Values.airflow.image }}"
+        image: "{{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}"
+        command: ["airflow", "celery", "worker"]
         env:
           {{- include "airflow.commonEnvVars" . | nindent 10 }}
         volumeMounts:
           {{- include "airflow.commonVolumeMounts" . | nindent 10 }}
-        
+      volumes:
+      - name: dags
+        persistentVolumeClaim:
+          claimName: airflow-dags
+      - name: logs
+        persistentVolumeClaim:
+          claimName: airflow-logs
+      - name: config
+        persistentVolumeClaim:
+          claimName: airflow-config
+      - name: plugins
+        persistentVolumeClaim:
+          claimName: airflow-plugins

@@ -40,10 +40,22 @@ mlflow:
     type: LoadBalancer
     port: 5000
 
-# Define PVCs if necessary, for example, for Airflow DAGs, logs, and MLflow's artifact storage.
+# Define PVCs
 persistence:
   enabled: true
-  storageClass: "standard" # This is GKE's default storage class, change as needed.
-  size: 10Gi
-
-# Add any other necessary components or configurations based on your deployment requirements.
+  dags:
+    storageClass: "standard"
+    accessMode: ReadWriteMany
+    size: 3Gi
+  logs:
+    storageClass: "standard"
+    accessMode: ReadWriteMany
+    size: 5Gi
+  config:
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+    size: 1Gi
+  plugins:
+    storageClass: "standard"
+    accessMode: ReadWriteOnce
+    size: 1Gi
