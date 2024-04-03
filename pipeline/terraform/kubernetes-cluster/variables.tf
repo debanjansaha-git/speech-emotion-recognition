@@ -25,6 +25,7 @@ variable "subnets" {
     subnet_name   = string
     subnet_ip     = string
     subnet_region = string
+    subnet_zones  = list(string)
   }))
 }
 

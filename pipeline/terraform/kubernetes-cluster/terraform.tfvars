@@ -10,13 +10,15 @@ vpc_name = "vpc-main"
 subnets = [
   {
     subnet_name   = "subnet-01"
-    subnet_ip     = "10.0.1.0/24"
-    subnet_region = "us-east1-a"
+    subnet_ip     = "10.10.0.0/24"
+    subnet_region = "us-east1"
+    subnet_zones  = ["us-east1-a", "us-east1-b"]
   },
   {
     subnet_name   = "subnet-02"
-    subnet_ip     = "10.0.2.0/24"
-    subnet_region = "us-east1-b"
+    subnet_ip     = "10.10.1.0/24"
+    subnet_region = "us-east1"
+    subnet_zones  = ["us-east1-c", "us-east1-d"]
   }
 ]
 
@@ -40,7 +42,7 @@ firewall_rules = [
     name        = "allow-internal"
     description = "Allow internal traffic"
     ranges      = ["10.0.0.0/8"]
-    ports       = ["all"]
+    ports       = []
     protocol    = "all"
   },
   {
@@ -60,8 +62,10 @@ spot_node_max_count        = 10
 spot_node_machine_type     = "e2-medium"
 
 # Service Account Variables
-service_account_name = "mlops-ser-sa"
+service_account_name = "sa-terraform"
 roles = [
   "roles/container.clusterAdmin",
-  "roles/container.developer"
+  "roles/container.developer",
+  "roles/compute.networkAdmin"
 ]
+

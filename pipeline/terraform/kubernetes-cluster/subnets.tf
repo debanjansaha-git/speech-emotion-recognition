@@ -9,10 +9,10 @@ resource "google_compute_subnetwork" "subnets" {
 
   secondary_ip_range {
     range_name    = "k8s-pod-range-${count.index}"
-    ip_cidr_range = "10.48.${count.index}.0/20"
+    ip_cidr_range = "10.142.${count.index * 4}.0/22"
   }
   secondary_ip_range {
     range_name    = "k8s-service-range-${count.index}"
-    ip_cidr_range = "10.52.${count.index}.0/20"
+    ip_cidr_range = "10.142.${count.index * 4 + 64}.0/22"
   }
 }
