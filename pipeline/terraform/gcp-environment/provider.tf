@@ -10,8 +10,8 @@ provider "google" {
 terraform {
   # Configures the backend for storing Terraform state files in Google Cloud Storage (GCS).
   backend "gcs" {
-    bucket = "tf-deploy-kube-test"                  # Specifies the name of the GCS bucket to store Terraform state files.
-    prefix = "terraform/state/kubernetes-setup"     # Sets the path prefix within the bucket where state files are stored, allowing for organized state management.
+    bucket = "tf-deploy-kube-test"                # Specifies the name of the GCS bucket to store Terraform state files.
+    prefix = "terraform/state/gcp-environment"    # Sets the path prefix within the bucket where state files are stored, allowing for organized state management.
   }
   # Defines required providers and their versions.
   required_providers {
