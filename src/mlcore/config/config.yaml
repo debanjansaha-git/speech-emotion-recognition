@@ -7,9 +7,9 @@ data_generation:
   gcp_metadata_bucket: metadata_store_bucket
   gcp_train_bucket: train-bucket-model
   gcp_test_bucket: test-bucket-model
-  metadata_dir: src/mlcore/artifacts/metadata
-  train_dir: src/mlcore/artifacts/data_ingestion/train_data
-  test_dir: src/mlcore/artifacts/data_ingestion/test_data
+  metadata_dir: '/opt/artifacts/metadata'
+  train_dir: '/opt/artifacts/data_ingestion/train_data/'
+  test_dir: '/opt/artifacts/data_ingestion/test_data/'
 
 
 ### ================================================================
@@ -63,11 +63,11 @@ data_validation:
 
 data_transformation:
   root_dir: src/mlcore/artifacts/data_transformation
-  metadata_path: src/mlcore/artifacts/data_validation/metadata.csv
-  output_path: src/mlcore/artifacts/data_transformation
-  train_path: src/mlcore/artifacts/data_transformation/train_data.parquet
-  val_path: src/mlcore/artifacts/data_transformation/val_data.parquet
-  test_path: src/mlcore/artifacts/data_transformation/test_data.parquet
+  metadata_path: /opt/artifacts/data_validation/metadata.csv
+  output_path: /opt/artifacts/data_transformation
+  train_path: /opt/artifacts/data_transformation/train_data.parquet
+  val_path: /opt/artifacts/data_transformation/val_data.parquet
+  test_path: /opt/artifacts/data_transformation/test_data.parquet
   
 ### ================================================================
 ###                 MODEL TRAIN CONFIGURATION

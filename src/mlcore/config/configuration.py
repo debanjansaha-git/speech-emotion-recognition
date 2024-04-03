@@ -86,12 +86,9 @@ class ConfigurationManager:
     def get_data_generation_config(self) -> DataGenerationConfig:
         
         config = self.config.data_generation
-        config_list = [
-            config.metadata_dir,
-            config.train_dir,
-            config.test_dir,
-        ]
-        create_directories(config_list)
+        create_directories([config.metadata_dir])
+        create_directories([config.train_dir])
+        create_directories([config.test_dir])
         
         data_generation_config = DataGenerationConfig(
             gcp_metadata_bucket = config.gcp_metadata_bucket,

@@ -1,5 +1,6 @@
 from mlcore import logger
 import os
+import shutil
 import yaml
 import json
 import joblib
@@ -119,3 +120,21 @@ def get_size(path: Path) -> str:
     """
     size_in_kb = round(os.path.getsize(path) / 1024)
     return f"~ {size_in_kb} KB"
+
+
+@ensure_annotations
+def move_files(source, destination):
+    """create list of directories
+
+    Args:
+        path_to_directories (list): list of path of directories
+        ignore_log (bool, optional): ignore if multiple dirs is to be created. Defaults to False.
+    """
+    # gather all files
+    allfiles = os.listdir(source)
+    
+    # iterate on all files to move them to destination folder
+    for f in allfiles:
+        src_path = os.path.join(source, f)
+        dst_path = os.path.join(destination, f)
+        shutil.move(src_path, dst_path)
