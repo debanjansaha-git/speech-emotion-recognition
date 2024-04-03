@@ -6,6 +6,7 @@ __pycache__/
 *.DS_Store
 *gcs_key.json
 *gcp_key_deb.json
+*kubeconfig
 *.terraform.*
 pipeline/terraform/terraform.tfstate
 # Datasets (huge!)
