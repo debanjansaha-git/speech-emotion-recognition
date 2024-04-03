@@ -33,7 +33,7 @@ cluster_version         = "latest"
 machine_type            = "e2-medium"
 disk_size_gb            = 30
 node_count              = 3
-node_locations          = ["us-east1-a", "us-east1-b"]
+node_locations          = ["us-east1-b", "us-east1-c"]
 cluster_channel         = "REGULAR"
 
 # Firewall Variables

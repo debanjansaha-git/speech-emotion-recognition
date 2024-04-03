@@ -1,7 +1,7 @@
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster
 resource "google_container_cluster" "primary" {
   name                     = var.cluster_name
-  location                 = var.zone
+  location                 = var.region
   remove_default_node_pool = true
   initial_node_count       = 1
   network                  = google_compute_network.main.self_link
@@ -9,9 +9,7 @@ resource "google_container_cluster" "primary" {
   logging_service          = "logging.googleapis.com/kubernetes"
   monitoring_service       = "monitoring.googleapis.com/kubernetes"
   networking_mode          = "VPC_NATIVE"
-
-  # Optional, if you want multi-zonal cluster
-  node_locations = var.node_locations
+  node_locations           = var.node_locations
 
   addons_config {
     http_load_balancing {
@@ -48,4 +46,28 @@ resource "google_container_cluster" "primary" {
   #       display_name = "private-subnet-w-jenkins"
   #     }
   #   }
+}
+
+output "cluster_endpoint" {
+  value = google_container_cluster.primary.endpoint
+}
+
+output "cluster_ca_certificate" {
+  value = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+}
+
+# Setup kubeconfig after cluster creation
+resource "null_resource" "kubeconfig_setup" {
+  depends_on = [google_container_cluster.primary]
+
+  provisioner "local-exec" {
+    command = "gcloud container clusters get-credentials ${google_container_cluster.primary.name} --region ${var.region} --project ${var.project_id}"
+    environment = {
+      KUBECONFIG = "${path.module}/kubeconfig"
+    }
+  }
+}
+
+provider "kubernetes" {
+  config_path = "${path.module}/kubeconfig"
 }
