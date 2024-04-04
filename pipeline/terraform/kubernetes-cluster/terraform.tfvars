@@ -55,17 +55,24 @@ firewall_rules = [                                      # Firewall Rules
 ]
 
 # Kubernetes Variables
-kube_gen_node_count        = 1                          # K8s standard cluster node count
-kube_gen_node_machine_type = "e2-small"                 # K8s standard cluster node machine type
+# On-Demand Resources
+kube_od_node_count         = 1                          # K8s standard cluster node count
+kube_od_node_machine_type  = "e2-small"                 # K8s standard cluster node machine type
+kube_od_node_min_count     = 1                          # K8s min node count using on-demand instance 
+kube_od_node_max_count     = 1                          # K8s max node count using on-demand instance 
+# Spot Resources
 spot_node_min_count        = 0                          # K8s min node count using spot instance 
 spot_node_max_count        = 10                         # K8s max node count using spot instance 
 spot_node_machine_type     = "e2-medium"                # K8s spot instance machine type
 
 # Service Account Variables
-service_account_name = "sa-terraform"                   # GCSA account name
+goog_service_account_name = "gcsa-terraform"            # GCSA account name
+kube_service_account_name = "ksa-terraform"             # KSA account name
 roles = [
   "roles/container.clusterAdmin",                       # manage Kubernetes cluster in GKE
   "roles/container.developer",                          # cluster application deployment
-  "roles/compute.networkAdmin"                          # manage VPC resources in GCP
+  "roles/compute.networkAdmin",                          # manage VPC resources in GCP
+  "roles/container.admin",
+  "roles/iam.serviceAccountAdmin",
 ]
 

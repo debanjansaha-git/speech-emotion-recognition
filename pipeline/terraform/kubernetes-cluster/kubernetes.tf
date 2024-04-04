@@ -2,6 +2,7 @@
 resource "google_container_cluster" "primary" {
   name                     = var.cluster_name
   location                 = var.region
+  project                  = var.project_id
   remove_default_node_pool = true
   initial_node_count       = 1
   network                  = data.terraform_remote_state.gcp_environment.outputs.vpc_self_link
@@ -13,14 +14,7 @@ resource "google_container_cluster" "primary" {
   networking_mode          = "VPC_NATIVE"
   node_locations           = var.node_locations
 
-  addons_config {
-    http_load_balancing {
-      disabled = true
-    }
-    horizontal_pod_autoscaling {
-      disabled = false
-    }
-  }
+  
 
   release_channel {
     channel = var.cluster_channel
@@ -48,6 +42,35 @@ resource "google_container_cluster" "primary" {
   #       display_name = "private-subnet-w-jenkins"
   #     }
   #   }
+
+  node_config {
+  machine_type = var.kube_od_node_machine_type
+  oauth_scopes = [
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/monitoring",
+  ]
+
+  metadata = {
+    "disable-legacy-endpoints" = "true"
+  }
+
+  workload_metadata_config {
+    mode = "GKE_METADATA"
+  }
+
+  labels = { # Update: Replace with desired labels
+    "environment" = "test"
+    "team"        = "devops"
+  }
+}
+  addons_config {
+    http_load_balancing {
+      disabled = true
+    }
+    horizontal_pod_autoscaling {
+      disabled = false
+    }
+  }
 }
 
 output "cluster_endpoint" {
@@ -86,6 +109,6 @@ resource "null_resource" "kubeconfig_setup" {
   }
 }
 
-provider "kubernetes" {
-  config_path = "${path.module}/kubeconfig"
-}
+# provider "kubernetes" {
+#   config_path = "${path.module}/kubeconfig"
+# }

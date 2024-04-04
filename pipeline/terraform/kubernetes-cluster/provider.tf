@@ -5,6 +5,13 @@ provider "google" {
   region  = var.region                    # Sets the default region for resources
 }
 
+provider "kubernetes" {
+  host = "https://${google_container_cluster.primary.endpoint}"
+  token = data.google_client_config.provider.access_token
+  cluster_ca_certificate = base64decode(
+    google_container_cluster.primary.master_auth[0].cluster_ca_certificate
+  )
+}
 # Terraform configuration block.
 # https://www.terraform.io/language/settings/backends/gcs
 terraform {
@@ -18,6 +25,14 @@ terraform {
     google = {
       source  = "hashicorp/google"
       version = "~> 4.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 4.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
     }
   }
 }

@@ -100,16 +100,28 @@ variable "firewall_rules" {
   }))
 }
 
-variable "kube_gen_node_count" {
-  description = "Number of nodes in the general node pool"
+variable "kube_od_node_count" {
+  description = "Number of nodes in the on-demand node pool"
   type        = number
   default     = 1
 }
 
-variable "kube_gen_node_machine_type" {
-  description = "Machine type for the general node pool"
+variable "kube_od_node_machine_type" {
+  description = "Machine type for the on-demand node pool"
   type        = string
   default     = "e2-medium"
+}
+
+variable "kube_od_node_min_count" {
+  description = "Minimum number of nodes in the spot node pool"
+  type        = number
+  default     = 0
+}
+
+variable "kube_od_node_max_count" {
+  description = "Maximum number of nodes in the spot node pool"
+  type        = number
+  default     = 10
 }
 
 variable "spot_node_min_count" {
@@ -130,10 +142,16 @@ variable "spot_node_machine_type" {
   default     = "e2-medium"
 }
 
-variable "service_account_name" {
-  description = "The name of the service account."
+variable "goog_service_account_name" {
+  description = "The name of the google cloud service account."
   type        = string
-  default     = "mlops-ser-sa"
+  default     = "mlops-gcsa"
+}
+
+variable "kube_service_account_name" {
+  description = "The name of the Kubernetes service account."
+  type        = string
+  default     = "mlops-ksa"
 }
 
 variable "roles" {
