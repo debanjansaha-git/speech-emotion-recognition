@@ -2,23 +2,19 @@
 resource "google_container_cluster" "primary" {
   name                     = var.cluster_name
   location                 = var.region
+  project                  = var.project_id
   remove_default_node_pool = true
   initial_node_count       = 1
-  network                  = google_compute_network.main.self_link
-  subnetwork               = google_compute_subnetwork.subnets[0].self_link
+  network                  = data.terraform_remote_state.gcp_environment.outputs.vpc_self_link
+  subnetwork               = data.terraform_remote_state.gcp_environment.outputs.subnets_self_links["subnet-01"]
+  # network                  = google_compute_network.main.self_link
+  # subnetwork               = google_compute_subnetwork.subnets[0].self_link
   logging_service          = "logging.googleapis.com/kubernetes"
   monitoring_service       = "monitoring.googleapis.com/kubernetes"
   networking_mode          = "VPC_NATIVE"
   node_locations           = var.node_locations
 
-  addons_config {
-    http_load_balancing {
-      disabled = true
-    }
-    horizontal_pod_autoscaling {
-      disabled = false
-    }
-  }
+  
 
   release_channel {
     channel = var.cluster_channel
@@ -46,6 +42,35 @@ resource "google_container_cluster" "primary" {
   #       display_name = "private-subnet-w-jenkins"
   #     }
   #   }
+
+  node_config {
+  machine_type = var.kube_od_node_machine_type
+  oauth_scopes = [
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/monitoring",
+  ]
+
+  metadata = {
+    "disable-legacy-endpoints" = "true"
+  }
+
+  workload_metadata_config {
+    mode = "GKE_METADATA"
+  }
+
+  labels = { # Update: Replace with desired labels
+    "environment" = "test"
+    "team"        = "devops"
+  }
+}
+  addons_config {
+    http_load_balancing {
+      disabled = true
+    }
+    horizontal_pod_autoscaling {
+      disabled = false
+    }
+  }
 }
 
 output "cluster_endpoint" {
@@ -56,9 +81,25 @@ output "cluster_ca_certificate" {
   value = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
 }
 
+resource "null_resource" "authenticate_with_gcloud" {
+  depends_on = [data.terraform_remote_state.gcp_environment]
+
+  provisioner "local-exec" {
+    command = <<EOT
+    echo '${data.terraform_remote_state.gcp_environment.outputs.gcsa_key}' > /tmp/gcsa_key.json
+    gcloud auth activate-service-account --key-file=/tmp/gcsa_key.json
+    EOT
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+
 # Setup kubeconfig after cluster creation
 resource "null_resource" "kubeconfig_setup" {
-  depends_on = [google_container_cluster.primary]
+  depends_on = [
+    google_container_cluster.primary,
+    null_resource.authenticate_with_gcloud
+  ]
 
   provisioner "local-exec" {
     command = "gcloud container clusters get-credentials ${google_container_cluster.primary.name} --region ${var.region} --project ${var.project_id}"
@@ -68,6 +109,6 @@ resource "null_resource" "kubeconfig_setup" {
   }
 }
 
-provider "kubernetes" {
-  config_path = "${path.module}/kubeconfig"
-}
+# provider "kubernetes" {
+#   config_path = "${path.module}/kubeconfig"
+# }

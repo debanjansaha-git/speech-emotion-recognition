@@ -8,7 +8,8 @@ __pycache__/
 *gcp_key_deb.json
 *kubeconfig
 *.terraform.*
-pipeline/terraform/terraform.tfstate
+*terraform.tfstate
+*tf.plan
 # Datasets (huge!)
 src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
 src/mlcore/artifacts/data_ingestion/ravdess/Actor*
