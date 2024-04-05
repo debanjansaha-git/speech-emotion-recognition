@@ -1,6 +1,7 @@
 ### Data Transformation Parameters
 data_transforms:
-  params: ['default', 'noise', 'pitch', 'pitch_noise']
+  train_params: ['default', 'noise', 'pitch', 'pitch_noise']
+  test_params: ['default']
 
 ### Model Parameters
 model_params:
