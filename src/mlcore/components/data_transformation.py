@@ -1,17 +1,21 @@
+import glob
 import io
 import os
 import warnings
 import yaml
 import timeit
 import multiprocessing as mp
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, dump, load
 import cProfile
 import pstats
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 import librosa
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 from mlcore import logger
 from mlcore.constants import *
@@ -277,7 +281,7 @@ class DataTransformation:
         data_transformation.train_test_split_data(test_size)
     """
 
-    def __init__(self, config: DataTransformationConfig):
+    def __init__(self, config: DataTransformationConfig, stage='train'):
         """
         Class for data transformation.
 
@@ -299,11 +303,12 @@ class DataTransformation:
         """
 
         self.config = config
+        self.stage = stage
         self.chunksize = 1000  # for processing data in chunks
-        self.X_mean = None
-        self.X_std = None
-        self.X_min = None
-        self.X_max = None
+        # self.mean = mean
+        # self.std = std
+        # self.min = min_value
+        # self.max = max_value
         # Audio Augmentation & Feature Extraction
         self.aug = AudioAugmenter()
         self.feat = FeatureExtractor()
@@ -311,7 +316,7 @@ class DataTransformation:
         # option to try multiple augmentation params and observe the influence on model performance
         with open(PARAMS_FILE_PATH, "r") as f:
             tfx_params = yaml.safe_load(f)
-        self.tfx_params = tfx_params["data_transforms"]["params"]
+        self.tfx_params = tfx_params["data_transforms"][f"{stage}_params"]
 
     def get_features(self, path, duration=2.5, offset=0.6):
         """
@@ -451,7 +456,9 @@ class DataTransformation:
         """
 
         root_dir = self.config.root_dir
-        metadata_dir = self.config.metadata_path
+        # TODO: Better way to do this?
+        metadata_dir = os.path.join(self.config.metadata_path, f'{self.stage}_data', f'metadata_{self.stage}.csv')
+
         profiler = cProfile.Profile()
         streams = io.StringIO()
 
@@ -467,10 +474,12 @@ class DataTransformation:
         logger.info("Multiprocessing started!")
         # Perform feature extraction in parallel using multiprocessing
         profiler.enable()  # enable cProfiler for monitoring
-        results = Parallel(n_jobs=num_cpus)(
+        results = Parallel(n_jobs=4)(
             delayed(self.process_feature)(path, emotion)
             for (path, emotion) in zip(paths, emotions)
         )
+        # results = [self.process_feature(path, emotion) for path, emotion in zip(paths, emotions)]
+        logger.info(f'Pre-preprocessing done for {len(results)} files')
         profiler.disable()  # terminate profiler
         elapsed_time = timeit.default_timer() - start
         logger.info(f"Elapsed Time: {elapsed_time:.2f} secs")
@@ -484,6 +493,8 @@ class DataTransformation:
         start = timeit.default_timer()
         # Start processing data in chunks of self.chunksize to reduce IO overheads
         profiler.enable()
+        pqwriter = None
+        outfile = os.path.join(f"{self.config.output_path}", f'{self.stage}_data.parquet')
         for i, chunk_start in enumerate(range(0, len(results), self.chunksize)):
             logger.info(f"Processing Chunk {i} now...")
             chunk_end = min(chunk_start + self.chunksize, len(results))
@@ -504,9 +515,19 @@ class DataTransformation:
             emotions_df["Emotions"] = Y_chunk  # Extract labels
 
             # Converted unstructured data -> structured data & storing as parquet for later use
-            emotions_df.to_parquet(
-                f"{self.config.output_path}/data_part_{i}.parquet", compression="gzip"
-            )
+            # emotions_df.to_parquet(
+            #     f"{self.config.output_path}/data_part_{i}.parquet", compression="gzip"
+            # )
+            table = pa.Table.from_pandas(emotions_df)
+            if i == 0:
+                # create a parquet write object giving it an output file
+                pqwriter = pq.ParquetWriter(outfile, table.schema)            
+            pqwriter.write_table(table)
+        
+        # close the parquet writer
+        if pqwriter:
+            pqwriter.close()
+
         profiler.disable()
         stats = (
             pstats.Stats(profiler, stream=streams).sort_stats("tottime").print_stats(20)
@@ -629,3 +650,66 @@ class DataTransformation:
         logger.info("Validation data written to disk!!")
         X_test.to_parquet(self.config.test_path, compression="gzip")
         logger.info("Test data written to disk!!")
+
+    def scale_data(self, method='standard'):
+        parquet_file = os.path.join(f"{self.config.output_path}", f'{self.stage}_data.parquet')
+        df = pd.read_parquet(parquet_file, engine='pyarrow')
+
+        logger.info(f'Loaded {self.stage} file of size {df.shape} for scaling: {self.stage}_data.parquet')
+        mean_csv = os.path.join(f"{self.config.output_path}", f'means.csv')
+        std_csv = os.path.join(f"{self.config.output_path}", f'stds.csv')
+
+        if self.stage == 'train':
+            if method == 'standard':
+                # Find a store of means and std values
+                # Create a new csv if not found
+                try:
+                    mean_df = pd.read_csv(mean_csv)
+                except FileNotFoundError:
+                    logger.info(f'No means.csv found. Creating ...')
+                    mean_df = pd.DataFrame()
+                try:
+                    std_df = pd.read_csv(std_csv)
+                except FileNotFoundError:
+                    logger.info(f'No stds.csv found. Creating ...')
+                    std_df = pd.DataFrame()
+
+                scaler = StandardScaler()
+                train_values = scaler.fit_transform(df.loc[:, df.columns != 'Emotions'])
+                train_values = np.hstack((train_values, df['Emotions'].values.reshape(-1,1)))
+                df_train = pd.DataFrame(train_values, columns=df.columns)
+                scaler_outfile = os.path.join(f"{self.config.output_path}", 'std_scaler.bin')
+                dump(scaler, scaler_outfile, compress=True)
+                mean_df = pd.concat([mean_df, pd.DataFrame(scaler.mean_.reshape(1,-1), columns=df.loc[:, df.columns != 'Emotions'].columns)], axis=0)
+                # pd.concat([pd.DataFrame(), pd.DataFrame(scaler.mean_.reshape(1,-1), columns=x.columns)], axis=0)
+                std_df = pd.concat([std_df, pd.DataFrame(np.sqrt(scaler.var_.reshape(1,-1)), columns=df.loc[:, df.columns != 'Emotions'].columns)])
+                mean_df.to_csv(mean_csv, index=False)
+                std_df.to_csv(std_csv, index=False)
+                df_train.to_parquet(parquet_file)
+
+            elif method == 'minmax':
+                pass 
+
+        elif self.stage == 'test':
+            if method == 'standard':
+                scaler_infile = os.path.join(f"{self.config.output_path}", 'std_scaler.bin')
+                scaler = load(scaler_infile)
+                test_values = scaler.transform(df.loc[:, df.columns != 'Emotions'])
+                test_values = np.hstack((test_values, df['Emotions'].values.reshape(-1,1)))
+                df_test = pd.DataFrame(test_values, columns=df.columns)
+            elif method == 'minmax':
+                pass
+            self.split_validation(df_test)
+        
+
+    def split_validation(self, test_df):
+        logger.info(f'Splitting the {self.stage} file to test and validation')
+        test_df, val_df = train_test_split(test_df, test_size=0.5, stratify=test_df["Emotions"], random_state=42)
+        
+        test_file = os.path.join(f"{self.config.output_path}", f'{self.stage}_data.parquet')
+        val_file = os.path.join(f"{self.config.output_path}", 'val_data.parquet')
+        
+        test_df.to_parquet(test_file)
+        logger.info(f'Created {self.stage}_data.parquet file')
+        val_df.to_parquet(val_file)
+        logger.info(f'Created val_data.parquet file')

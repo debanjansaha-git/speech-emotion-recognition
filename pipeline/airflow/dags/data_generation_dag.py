@@ -19,15 +19,21 @@ with DAG(
     catchup=False,
 ) as dag_generation:
 
-    data_generation = PythonOperator(
-        task_id="data_generation",
+    data_generation_0 = PythonOperator(
+        task_id="data_generation_zero",
         python_callable=DataGenerationTrainingPipeline().main,
     )
 
-    # trigger_transformation_dag = TriggerDagRunOperator(
-    #     task_id="trigger_data_transformation_dag",
-    #     trigger_dag_id="data_transformation_dag",
-    # )
+    data_generation_1 = PythonOperator(
+        task_id="data_generation_one",
+        python_callable=DataGenerationTrainingPipeline().main,
+    )
+
+    trigger_transformation_dag = TriggerDagRunOperator(
+        task_id="trigger_data_transformation_dag",
+        trigger_dag_id="data_transformation_dag",
+    )
 
     # Here, you might want to trigger another DAG or end the pipeline.
     # If ending, use a DummyOperator or similar as a visual endpoint.
+    data_generation_0 >> data_generation_1 >> trigger_transformation_dag

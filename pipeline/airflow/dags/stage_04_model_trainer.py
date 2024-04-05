@@ -30,15 +30,16 @@ class ModelTrainerTrainingPipeline:
         pipeline.main()
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, hypertune=False, epochs=2):
+        self.hypertune = hypertune
+        self.epochs = epochs
 
     def main(self):
         try:
             config_manager = ConfigurationManager()
             model_trainer_config = config_manager.get_model_trainer_config()
             model_trainer = ModelTrainer(config=model_trainer_config)
-            model_trainer.train(hypertune=True)
+            model_trainer.train(hypertune=self.hypertune, epochs=self.epochs)
         except Exception as e:
             raise e
 

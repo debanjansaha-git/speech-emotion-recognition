@@ -62,8 +62,8 @@ data_validation:
 ### ================================================================
 
 data_transformation:
-  root_dir: src/mlcore/artifacts/data_transformation
-  metadata_path: /opt/artifacts/data_validation/metadata.csv
+  root_dir: /opt/artifacts/data_transformation
+  metadata_path: /opt/artifacts/data_ingestion
   output_path: /opt/artifacts/data_transformation
   train_path: /opt/artifacts/data_transformation/train_data.parquet
   val_path: /opt/artifacts/data_transformation/val_data.parquet
@@ -74,9 +74,9 @@ data_transformation:
 ### ================================================================
 
 model_trainer:
-  root_dir: src/mlcore/artifacts/model_training
-  train_path: src/mlcore/artifacts/data_transformation/train_data.parquet
-  val_path: src/mlcore/artifacts/data_transformation/val_data.parquet
+  root_dir: /opt/artifacts/model_training
+  train_path: /opt/artifacts/data_transformation/train_data.parquet
+  val_path: /opt/artifacts/data_transformation/val_data.parquet
   model_name: model.joblib
 
 ### ================================================================
