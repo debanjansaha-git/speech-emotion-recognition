@@ -18,7 +18,7 @@ google-cloud-storage
 dvc
 psutil
 pyarrow
-# -e .
+-e .
 
 keras
 tensorflow

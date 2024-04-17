@@ -7,9 +7,9 @@ data_generation:
   gcp_metadata_bucket: metadata_store_bucket
   gcp_train_bucket: train-bucket-model
   gcp_test_bucket: test-bucket-model
-  metadata_dir: '/opt/artifacts/metadata'
-  train_dir: '/opt/artifacts/data_ingestion/train_data/'
-  test_dir: '/opt/artifacts/data_ingestion/test_data/'
+  metadata_dir: './metadata'
+  train_dir: './train'
+  test_dir: './test'
 
 
 ### ================================================================
