@@ -17,4 +17,9 @@ optuna
 google-cloud-storage
 dvc
 psutil
+pyarrow
 # -e .
+
+keras
+tensorflow
+mlflow

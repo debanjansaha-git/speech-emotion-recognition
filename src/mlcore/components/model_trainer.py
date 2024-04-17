@@ -148,7 +148,7 @@ class ModelTrainer:
 
         return X_train, y_train_enc, X_val, y_val_enc
 
-    def train(self, hypertune=False):
+    def train(self, hypertune=False, epochs=2):
         """
         Trains the model using the prepared training and validation data.
 
@@ -209,7 +209,7 @@ class ModelTrainer:
                 X_train,
                 y_train_enc,
                 batch_size=64,
-                epochs=2,
+                epochs=epochs,
                 validation_data=(X_val, y_val_enc),
                 callbacks=[rlrp, LoggingCallback(logger.info)],
             )
@@ -221,8 +221,9 @@ class ModelTrainer:
 
             # Save model
             logger.info("Export Trained Model for future inference")
+            model_file_name = f'{self.config.model_name}_htuned' if hypertune else f'{self.config.model_name}'
             joblib.dump(
-                model, os.path.join(self.config.root_dir, self.config.model_name)
+                model, os.path.join(self.config.root_dir, model_file_name)
             )
 
     def cnn_model_1(

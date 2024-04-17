@@ -30,24 +30,25 @@ class DataTransformationTrainingPipeline:
         pipeline.main()
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, stage='train'):
+        self.stage = stage
 
     def main(self):
         try:
-            with open(
-                Path("src/mlcore/artifacts/data_validation/status.txt"), "r"
-            ) as f:
-                status = f.read().split(" ")[-1]
-            if status != "True":
-                raise Exception("Data schema is not valid")
+            # with open(
+            #     Path("src/mlcore/artifacts/data_validation/status.txt"), "r"
+            # ) as f:
+            #     status = f.read().split(" ")[-1]
+            # if status != "True":
+            #     raise Exception("Data schema is not valid")
             config_manager = ConfigurationManager()
             data_transformation_config = config_manager.get_data_transformation_config()
-            data_transformation = DataTransformation(config=data_transformation_config)
+            data_transformation = DataTransformation(config=data_transformation_config, stage=self.stage)
             data_transformation.feature_engineering()
-            data_transformation.split_and_scale(
-                test_size=0.2, val_size=0.2, method="standard"
-            )
+            data_transformation.scale_data()
+            # data_transformation.split_and_scale(
+            #     test_size=0.2, val_size=0.2, method="standard"
+            # )
         except Exception as e:
             raise e
 

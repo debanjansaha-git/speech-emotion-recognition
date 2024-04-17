@@ -79,7 +79,7 @@ class DataGeneration:
         metadata_bucket = client.bucket(bucket_name=self.config.gcp_metadata_bucket)
         # List all files present on the bucket
         metadata_files = [blob.name for blob in metadata_bucket.list_blobs()]
-        logger.info(f'Metadata file found {metadata_files}')
+        logger.info(f'Metadata files found {metadata_files}')
 
         # Find the latest metadata file metadata_xx.csv where xx is max
         latest_file_num = max(int(metadata_file.strip('.csv').split('_')[1]) for metadata_file in metadata_files if metadata_file.endswith(".csv"))
