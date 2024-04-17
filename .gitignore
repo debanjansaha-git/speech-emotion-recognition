@@ -5,15 +5,21 @@ __pycache__/
 *$py.class
 *.DS_Store
 *gcs_key.json
-
+*gcp_key_deb.json
+*kubeconfig
+*.terraform.*
+*terraform.tfstate
+*tf.plan
 # Datasets (huge!)
-# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
-# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/Actor*
-pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/ravdess/audio*
-# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/savee/ALL/*
-# pipeline/airflow/dags/src/mlcore/artifacts/data_ingestion/tess/TESS*/
-# *parquet*
-# pipeline/airflow/dags/src/mlcore/artifacts/data_transformation/emotion.csv
+src/mlcore/artifacts/data_ingestion/cremad/AudioWAV/*
+src/mlcore/artifacts/data_ingestion/ravdess/Actor*
+src/mlcore/artifacts/data_ingestion/ravdess/audio*
+src/mlcore/artifacts/data_ingestion/savee/ALL/*
+src/mlcore/artifacts/data_ingestion/tess/TESS*/
+src/mlcore/artifacts/data_transformation/emotion.csv
+*parquet*
+*npy
+*joblib
 
 # Logs
 *logs/
@@ -173,3 +179,5 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+pipeline/terraform/terraform.tfstate
+pipeline/terraform/terraform.tfstate.backup

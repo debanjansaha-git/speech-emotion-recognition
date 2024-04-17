@@ -1,11 +1,11 @@
 from mlcore.config.configuration import ConfigurationManager
-from mlcore.components.data_ingestion import DataIngestion
+from mlcore.components.data_generation import DataGeneration
 from mlcore import logger
 
-STAGE_NAME = "data ingestion stage"
+STAGE_NAME = "data generation stage"
 
 
-class DataIngestionTrainingPipeline:
+class DataGenerationTrainingPipeline:
     """
     Class for the data ingestion training pipeline.
 
@@ -35,11 +35,9 @@ class DataIngestionTrainingPipeline:
     def main(self):
         try:
             config_manager = ConfigurationManager()
-            data_ingestion_config_list = config_manager.get_data_ingestion_config()
-            for data_ingestion_config in data_ingestion_config_list:
-                data_ingestion = DataIngestion(config=data_ingestion_config)
-                # data_ingestion.download_data()
-                data_ingestion.download_from_gcp()
+            data_ingestion_config = config_manager.get_data_generation_config()
+            data_ingestion = DataGeneration(config=data_ingestion_config)
+            data_ingestion.load_1000_files()
         except Exception as e:
             raise e
 
@@ -47,7 +45,7 @@ class DataIngestionTrainingPipeline:
 if __name__ == "__main__":
     try:
         logger.info(f">>>> stage {STAGE_NAME} started <<<<")
-        obj = DataIngestionTrainingPipeline()
+        obj = DataGenerationTrainingPipeline()
         obj.main()
         logger.info(f">>>> stage {STAGE_NAME} completed <<<<\n\nx========x")
     except Exception as e:

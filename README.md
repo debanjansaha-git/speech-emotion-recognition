@@ -7,6 +7,11 @@ In today's digital age, understanding human emotions from various sources like a
 
 - [End-to-End MLOps Pipeline for Emotion Detection](#end-to-end-mlops-pipeline-for-emotion-detection)
   - [Table of Contents](#table-of-contents)
+  - [Steps to run this pipeline](#steps-to-run-this-pipeline)
+    - [Airflow Service](#airflow-service)
+      - [Using Terraform for IaaC deployments in GCP](#using-terraform-for-iaac-deployments-in-gcp)
+      - [Run Airflow using GCP Management Console](#run-airflow-using-gcp-management-console)
+      - [Run Airflow in your Local System](#run-airflow-in-your-local-system)
   - [Folder Structure \& Coding Standards](#folder-structure--coding-standards)
       - [Read More about our Coding Standards](#read-more-about-our-coding-standards)
   - [Datasets](#datasets)
@@ -31,6 +36,80 @@ In today's digital age, understanding human emotions from various sources like a
   - [License](#license)
   - [Internal Notes by the Team](#internal-notes-by-the-team)
 
+
+## Steps to run this pipeline
+### Airflow Service
+Our pipeline runs using Airflow and Docker Container. 
+As a prerequisite, you should have Docker running on your system, or you can also run Docker on cloud VMs.
+
+#### Using Terraform for IaaC deployments in GCP
+
+We want to use Terraform for IaaC (Infrastructure-as-a-Code) for allocating our resources and destroying them when we are done with it.
+
+If you do not have Terraform installed in your system, please follow the guide mentioned [Here](docs/TerraformGuide.md)
+
+Once Terraform has been installed, in order to allocate resources on GCP, use the commands below:
+
+- Navigate to the directory pipeline/terraform
+
+- Execute the commands:
+- To initialize terraform
+```bash
+terraform init
+```
+- To create a terraform execution plan to allocate resources and save it to a file
+```bash
+terraform plan -out tf.plan
+```
+- Convert the execution plan to a human-readable format
+```bash
+terraform show  tf.plan > tfplan.ansi
+```
+- View the terraform plan
+```bash
+less -R tfplan.ansi
+```
+- Execute the terraform plan created in the earlier steps
+```bash
+terraform apply "tf.plan"
+```
+
+- Once you are satisfied with your work, or your work has completed, make sure to delete all the resources allocated by:
+```bash
+terraform destroy
+```
+
+#### Run Airflow using GCP Management Console
+
+The above mentioned steps can also be performed from the Google Cloud management console using GUI.
+Please follow the detailed instructions present in the following file for setting up Airflow using the managemenet console and running it in GCP.
+
+[Airflow in GCP](docs/SetupAirflowGCP.md)
+
+#### Run Airflow in your Local System
+
+- Clone the GitHub repository
+```bash
+git clone https://github.com/debanjansaha-git/speech-emotion-recognition.git
+```
+- This will clone the github repository in the folder called "speech-emotion-recognition" and `cd speech-emotion-recognition`
+- Move to the **pipeline/airflow** directory
+- With the airflow directory as your working directory, run the following command to start airflow in docker:
+```bash
+docker compose up
+```
+
+- If you make any changes to the code, you have to re-build the container. For this, you want to stop the container and start it again, with a re-build.
+
+- To remove current containers:
+```bash
+docker compose down
+```
+
+- To build and start the container:
+```bash
+docker compose up --build
+```
 
 ## Folder Structure & Coding Standards
 
@@ -114,7 +193,7 @@ The entire application is orchestrated by Airflow so running the Docker containe
 - With the **airflow** directory as your working directory, run the following command to start airflow in docker one after the other:
 
 ```bash
-docker compose up airflow-init
+docker compose up --build
 ```
 This command initializes the database and services needed to start and run the airflow webserver, scheduler, etc.
 
@@ -128,26 +207,20 @@ To open the Airflow UI, open the following link in your browser:
 
 ### MLFlow Pipeline
 
-- Move to the **$HOME** directory
-- Create your virtual environment and install all the dependencies
-
-```python
-pip install -r ./src/mlflow/requirements.txt
-```
-
-- Start MLFlow Web UI:
+- Move to the **pipeline/mlflow** directory
+- With the **mlflow** directory as your working directory, run the following command to start mlflow in docker one after the other:
 
 ```bash
-mlflow ui --port=5001
+docker compose up --build
 ```
-This will fire up the MLFlow UI, and open the following link in your browser:
-[http://0.0.0.0:5001](http://0.0.0.0:5001)
+This command initializes the database and services needed to start and run the mlflow tracker.
 
-- In order to log experiments using MLFlow execute the Trainer module from the **$HOME** directory:
-
-```python
-python ./src/mlflow/mlflow_trainer.py
+```bash
+docker compose up
 ```
+To open the MLflow UI, open the following link in your browser:
+[http://0.0.0.0:5001/](http://0.0.0.0:5001/)
+
 
 ### Core ML Module
 
@@ -249,10 +322,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 
 ## Internal Notes by the Team
-
-**1. How to contribute to the the pipeline (How to develop your own dags)**
-
-The dags, logs, plugins and secrets folders are copied into the container and are updated in real-time. Any changes you make to the files inside these folders will reflect inside the container.
-
-
 

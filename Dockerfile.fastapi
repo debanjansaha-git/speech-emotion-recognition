@@ -1,0 +1,27 @@
+FROM python:3.10.13-slim-bookworm
+
+WORKDIR /app
+
+# Update pip
+RUN apt-get update && \
+    apt-get -y install libpq-dev gcc && \
+    pip install --no-cache-dir --upgrade pip
+
+# Install FastAPI dependencies
+COPY ./pipeline/fastapi/requirements.txt ./fastapi-requirements.txt
+RUN pip install -r fastapi-requirements.txt
+
+# Copy the FastAPI application
+COPY ./pipeline/fastapi .
+
+# Expose port for FastAPI
+EXPOSE 8000
+
+USER root
+COPY --chown=0 --chmod=777 ./setup.py ./README.md ./
+COPY --chown=0 --chmod=777 ./src ./src
+COPY --chown=0 --chmod=777 ./artifacts ./artifacts
+RUN python ./setup.py install
+
+# Run Uvicorn with FastAPI app
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

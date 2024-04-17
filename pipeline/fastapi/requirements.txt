@@ -1,3 +1,16 @@
+fastapi
+uvicorn
+httpx
+pydantic
+tensorflow
+tensorboard
+keras
+google-auth
+google-cloud
+google-cloud-core
+google-api-core
+google-cloud-storage
+gcloud
 pandas
 mlflow
 numpy
@@ -17,9 +30,3 @@ optuna
 google-cloud-storage
 dvc
 psutil
-pyarrow
-# -e .
-
-keras
-tensorflow
-mlflow

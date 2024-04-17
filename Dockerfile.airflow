@@ -1,0 +1,21 @@
+FROM apache/airflow:2.8.1
+
+WORKDIR /opt/airflow
+
+COPY ./pipeline/airflow/requirements.txt /opt/airflow/
+COPY ./pipeline/airflow/dags /opt/airflow/dags
+RUN pip install -U pip --upgrade pip
+RUN pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION:-2.8.1}" -r /opt/airflow/requirements.txt
+EXPOSE 8080
+
+# RUN apt-get update
+# RUN apt-get install -y libsndfile1
+
+USER root
+COPY --chown=0 --chmod=777 ./setup.py ./README.md ./
+COPY --chown=0 --chmod=777 ./src ./src
+COPY --chown=0 --chmod=777 ./artifacts /opt/artifacts
+COPY --chown=0 --chmod=777 ./pipeline/airflow/dags/data_pipeline.py /opt/airflow/dags/data_pipeline.py
+RUN python ./setup.py install
+
+USER ${AIRFLOW_UID:-0}

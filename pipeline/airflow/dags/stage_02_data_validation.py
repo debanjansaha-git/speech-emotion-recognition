@@ -6,6 +6,27 @@ STAGE_NAME = "data validation stage"
 
 
 class DataValidationTrainingPipeline:
+    """
+    Class for data validation.
+
+    Summary:
+        This class represents the data validation process.
+
+    Explanation:
+        The DataValidation class provides a placeholder for the data validation process.
+        It does not have any specific behavior or functionality.
+
+    Methods:
+        None.
+
+    Raises:
+        None.
+
+    Examples:
+        validation = DataValidation()
+        # No specific usage examples for this class.
+    """
+
     def __init__(self):
         pass
 

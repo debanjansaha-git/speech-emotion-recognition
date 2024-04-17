@@ -1,5 +1,0 @@
-outs:
-- md5: 71eef1ddd99ea34758f9cc306abccbfb
-  size: 680971425
-  hash: md5
-  path: emotions.parquet.gzip

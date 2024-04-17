@@ -1,9 +1,0 @@
-COLUMNS:
-  Emotions: string
-  EmotionIntensity: string
-  ActorNumber: int
-  FilePath: string
-  Dataset: string
-
-TARGET_COLUMN: 
-  Emotion: int
