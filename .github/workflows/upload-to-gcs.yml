@@ -28,3 +28,10 @@ jobs:
       with:
         path: 'src/mlcore'
         destination: 'us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/'
+
+    - name: 'Upload DAG Codes into DAGs'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'pipeline/airflow/dags'
+        destination: 'us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/'
+        parent: false
