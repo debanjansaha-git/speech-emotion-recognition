@@ -1,9 +1,9 @@
-import os
 from pathlib import Path
+import os
 
 """Contains path to configuration files"""
 
-if os.getenv["RUNTIME"] == "local":
+if os.environ.get("RUNTIME", '') == "local":
     CONFIG_FILE_PATH = Path("src/mlcore/config/config_local.yaml")
     PARAMS_FILE_PATH = Path("src/mlcore/constants/params.yaml")
     SCHEMA_FILE_PATH = Path("src/mlcore/constants/schema.yaml")
