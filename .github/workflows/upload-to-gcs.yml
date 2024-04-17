@@ -3,21 +3,41 @@ name: Upload Folder to Google Cloud Storage
 on:
   push:
     branches:
-      - main  # Set this to the branch that triggers the upload
-
+      - main 
 jobs:
   upload-to-gcs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
-    - name: Checkout Repo
+    - id: checkout
+      name: Checkout Repo
       uses: actions/checkout@v3
 
-    - name: Set up Google Cloud
-      uses: google-github-actions/setup-gcloud@v0.5.1
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
       with:
-        service_account_key: ${{ secrets.GCS_SA_KEY }}
-        export_default_credentials: true
+        workload_identity_provider: 'projects/1016052942653/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+        service_account: 'speech-emotion-access-account@firm-site-417617.iam.gserviceaccount.com'
 
-    - name: Upload files to GCS
-      run: |
-        gsutil -m cp -r ./src/ gs://us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/
+    - id: 'upload-folder'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'src'
+        destination: 'gs://us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/'
+
+
+    # - name: Cloud Storage Uploader
+    #   uses: google-github-actions/upload-cloud-storage@v2.1.0
+
+    # - name: Set up Google Cloud
+    #   uses: google-github-actions/setup-gcloud@latest
+    #   with:
+    #     service_account_key: ${{ secrets.GCS_SA_KEY }}
+    #     export_default_credentials: true
+
+    # - name: Upload files to GCS
+    #   run: |
+    #     gsutil -m cp -r ./src/ gs://us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/
