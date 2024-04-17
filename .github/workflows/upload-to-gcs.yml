@@ -31,7 +31,7 @@ jobs:
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'src'
-        destination: 'gs://us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/'
+        destination: 'us-east1-airflow-orchestrat-9d0ee4bd-bucket/dags/'
 
     #   uses: 'google-github-actions/auth@v2'
     #   with:
